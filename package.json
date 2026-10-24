@@ -1,0 +1,24 @@
+{
+  "name": "lead-hunter-license-server",
+  "version": "2.0.0",
+  "description": "Enterprise Licensing, Authorization & Device Management Backend for Lead Hunter",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^11.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

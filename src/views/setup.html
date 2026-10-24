@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lead Hunter — Activate License & Setup Account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F4F5F9;
+      --surface: #FFFFFF;
+      --border: #EEF1F6;
+      --border-darker: #E2E8F0;
+      --accent: #5B4DFB;
+      --accent-hover: #4D3EE8;
+      --accent-soft: #EEF0FF;
+      --text: #1E2538;
+      --muted: #8492A6;
+      --danger: #FF647C;
+      --success: #00B074;
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    
+    .card { background: var(--surface); border: 1px solid var(--border-darker); border-radius: 20px; padding: 40px; width: 100%; max-width: 460px; box-shadow: 0 24px 60px rgba(0,0,0,0.08); }
+    .brand-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+    .logo-badge { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #635BFF, #8479FF); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 1.15rem; box-shadow: 0 4px 14px rgba(91, 77, 251, 0.35); flex-shrink: 0; }
+    .brand-title { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.3px; line-height: 1.2; color: #1E2538; }
+    .brand-title small { font-size: 0.8rem; color: var(--muted); font-weight: 600; display: block; margin-top: 2px; }
+    
+    .desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.5; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+    .form-group label { font-size: 0.8rem; color: #64748B; font-weight: 700; }
+    .input { height: 44px; background: #F8FAFC; border: 1px solid var(--border-darker); color: #1E2538; padding: 0 14px; border-radius: 10px; font-size: 14px; outline: none; transition: all 0.15s ease; width: 100%; font-family: var(--font); }
+    .input:focus { background: #FFFFFF; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(91, 77, 251, 0.15); }
+    
+    .btn { height: 44px; background: var(--accent); color: #fff; border: none; padding: 0 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14.5px; width: 100%; margin-top: 10px; transition: all 0.15s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(91, 77, 251, 0.25); text-decoration: none; }
+    .btn:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(91, 77, 251, 0.35); }
+    .btn:active { transform: translateY(0); }
+    
+    .code-key { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 1.15rem; background: #EEF0FF; padding: 14px; border-radius: 12px; color: var(--accent); border: 1px solid #D6D8FF; text-align: center; margin-bottom: 20px; font-weight: 800; letter-spacing: 1px; user-select: all; }
+    #successBox { display: none; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div id="formBox">
+      <div class="brand-header">
+        <div class="logo-badge">LH</div>
+        <div class="brand-title">
+          Lead Hunter Pro
+          <small>Buyer Invitation &amp; Onboarding</small>
+        </div>
+      </div>
+      <p class="desc">
+        Welcome! Complete your account profile to securely activate your Lead Hunter license and access your portal.
+      </p>
+      
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="setupName" class="input" placeholder="e.g. Alex Johnson">
+      </div>
+      <div class="form-group">
+        <label>Account Email</label>
+        <input type="email" id="setupEmail" class="input" placeholder="you@domain.com">
+      </div>
+      <div class="form-group">
+        <label>Set Account Password (min 6 chars)</label>
+        <input type="password" id="setupPass" class="input" placeholder="••••••••">
+      </div>
+      <button class="btn" id="btnSubmitSetup">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+        Activate License &amp; Sign In
+      </button>
+      <div id="setupErr" style="color: var(--danger); font-size: 0.85rem; margin-top: 14px; text-align: center; font-weight: 600;"></div>
+    </div>
+
+    <div id="successBox">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #E6F9F3; color: #00B074; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2 style="color: #1E2538; font-size: 1.35rem; font-weight: 800; margin-bottom: 8px;">License Activated!</h2>
+      <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 22px; line-height: 1.45;">
+        Your Chrome Extension license key has been generated and bound to your account:
+      </p>
+      <div class="code-key" id="revealedKey">LH-XXXX-XXXX-XXXX</div>
+      <p style="color: var(--muted); font-size: 0.82rem; margin-bottom: 24px; line-height: 1.4;">
+        Copy this key and paste it directly into your Lead Hunter Chrome extension to begin extracting leads.
+      </p>
+      <button class="btn" onclick="location.href='/portal'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Open Customer Dashboard
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const token = new URLSearchParams(location.search).get('token');
+    const $ = (id) => document.getElementById(id);
+
+    if (!token) {
+      $('formBox').innerHTML = `
+        <div style="color:var(--danger); font-size:1.1rem; font-weight:700; margin-bottom:8px;">Invalid or Expired Invite Link</div>
+        <p style="color:var(--muted); font-size:0.88rem; line-height:1.4;">Please contact your license administrator to request a valid invitation link.</p>
+      `;
+    }
+
+    $('btnSubmitSetup').addEventListener('click', async () => {
+      const name = $('setupName').value.trim();
+      const email = $('setupEmail').value.trim();
+      const password = $('setupPass').value;
+      if (!name || !email || !password) {
+        $('setupErr').textContent = 'Please fill out all fields.';
+        return;
+      }
+      if (password.length < 6) {
+        $('setupErr').textContent = 'Password must be at least 6 characters.';
+        return;
+      }
+
+      $('btnSubmitSetup').disabled = true;
+      $('btnSubmitSetup').innerHTML = 'Activating...';
+      $('setupErr').textContent = '';
+
+      try {
+        const res = await fetch('/portal/api/setup-invite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, name, email, password }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          localStorage.setItem('lh_portal_token', data.token);
+          $('formBox').style.display = 'none';
+          $('revealedKey').textContent = data.licenseKey || 'Activated';
+          $('successBox').style.display = 'block';
+        } else {
+          $('setupErr').textContent = data.message || 'Setup failed';
+        }
+      } catch (err) {
+        $('setupErr').textContent = 'Network communication error';
+      } finally {
+        $('btnSubmitSetup').disabled = false;
+        $('btnSubmitSetup').innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+          Activate License &amp; Sign In
+        `;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lead Hunter — Reset Password</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F4F5F9;
+      --surface: #FFFFFF;
+      --border: #EEF1F6;
+      --border-darker: #E2E8F0;
+      --accent: #5B4DFB;
+      --accent-hover: #4D3EE8;
+      --accent-soft: #EEF0FF;
+      --text: #1E2538;
+      --muted: #8492A6;
+      --danger: #FF647C;
+      --success: #00B074;
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    
+    .card { background: var(--surface); border: 1px solid var(--border-darker); border-radius: 20px; padding: 40px; width: 100%; max-width: 440px; box-shadow: 0 24px 60px rgba(0,0,0,0.08); }
+    .brand-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+    .logo-badge { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #635BFF, #8479FF); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 1.15rem; box-shadow: 0 4px 14px rgba(91, 77, 251, 0.35); flex-shrink: 0; }
+    .brand-title { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.3px; line-height: 1.2; color: #1E2538; }
+    .brand-title small { font-size: 0.8rem; color: var(--muted); font-weight: 600; display: block; margin-top: 2px; }
+    
+    .desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.5; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+    .form-group label { font-size: 0.8rem; color: #64748B; font-weight: 700; }
+    .input { height: 44px; background: #F8FAFC; border: 1px solid var(--border-darker); color: #1E2538; padding: 0 14px; border-radius: 10px; font-size: 14px; outline: none; transition: all 0.15s ease; width: 100%; font-family: var(--font); }
+    .input:focus { background: #FFFFFF; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(91, 77, 251, 0.15); }
+    
+    .btn { height: 44px; background: var(--accent); color: #fff; border: none; padding: 0 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14.5px; width: 100%; margin-top: 10px; transition: all 0.15s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(91, 77, 251, 0.25); text-decoration: none; }
+    .btn:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(91, 77, 251, 0.35); }
+    .btn:active { transform: translateY(0); }
+    #successBox { display: none; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div id="formBox">
+      <div class="brand-header">
+        <div class="logo-badge">LH</div>
+        <div class="brand-title">
+          Lead Hunter Pro
+          <small>Password Reset &amp; Recovery</small>
+        </div>
+      </div>
+      <p class="desc">
+        Set a new secure password for your customer portal account.
+      </p>
+      
+      <div class="form-group">
+        <label>New Password (min 6 characters)</label>
+        <input type="password" id="newPass" class="input" placeholder="••••••••">
+      </div>
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <input type="password" id="confirmPass" class="input" placeholder="••••••••">
+      </div>
+      <button class="btn" id="btnSubmitReset">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Save New Password
+      </button>
+      <div id="resetErr" style="color: var(--danger); font-size: 0.85rem; margin-top: 14px; text-align: center; font-weight: 600;"></div>
+    </div>
+
+    <div id="successBox">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #E6F9F3; color: #00B074; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2 style="color: #1E2538; font-size: 1.35rem; font-weight: 800; margin-bottom: 8px;">Password Updated!</h2>
+      <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 24px; line-height: 1.45;">
+        Your customer account password has been updated successfully. You can now log into your portal.
+      </p>
+      <button class="btn" onclick="location.href='/portal'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In to Portal
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const token = new URLSearchParams(location.search).get('token');
+    const $ = (id) => document.getElementById(id);
+
+    if (!token) {
+      $('formBox').innerHTML = `
+        <div style="color:var(--danger); font-size:1.1rem; font-weight:700; margin-bottom:8px;">Invalid or Expired Reset Link</div>
+        <p style="color:var(--muted); font-size:0.88rem; line-height:1.4;">Please contact your license administrator to request a new password recovery link.</p>
+      `;
+    }
+
+    $('btnSubmitReset').addEventListener('click', async () => {
+      const p1 = $('newPass').value;
+      const p2 = $('confirmPass').value;
+      if (!p1 || p1.length < 6) {
+        $('resetErr').textContent = 'Password must be at least 6 characters.';
+        return;
+      }
+      if (p1 !== p2) {
+        $('resetErr').textContent = 'Passwords do not match.';
+        return;
+      }
+
+      $('btnSubmitReset').disabled = true;
+      $('btnSubmitReset').innerHTML = 'Saving...';
+      $('resetErr').textContent = '';
+
+      try {
+        const res = await fetch('/portal/api/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, newPassword: p1 }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          $('formBox').style.display = 'none';
+          $('successBox').style.display = 'block';
+        } else {
+          $('resetErr').textContent = data.message || 'Error resetting password';
+        }
+      } catch (err) {
+        $('resetErr').textContent = 'Network error resetting password';
+      } finally {
+        $('btnSubmitReset').disabled = false;
+        $('btnSubmitReset').innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Save New Password
+        `;
+      }
+    });
+  </script>
+</body>
+</html>

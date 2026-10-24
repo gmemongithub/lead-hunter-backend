@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lead Hunter — Enterprise License Control Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F4F5F9;
+      --sidebar: #FFFFFF;
+      --surface: #FFFFFF;
+      --surface-subtle: #F8FAFC;
+      --border: #EEF1F6;
+      --border-darker: #E2E8F0;
+      --accent: #5B4DFB;
+      --accent-hover: #4D3EE8;
+      --accent-soft: #EEF0FF;
+      --text: #1E2538;
+      --muted: #8492A6;
+      --subtle: #94A3B8;
+      --danger: #FF647C;
+      --danger-soft: #FFEBEF;
+      --danger-border: #FECDD3;
+      --success: #00B074;
+      --success-soft: #E6F9F3;
+      --success-border: #B3F0DB;
+      --warning: #FFA800;
+      --warning-soft: #FFF7E6;
+      --warning-border: #FDE68A;
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; overflow-x: hidden; }
+
+    /* Login Modal Overlay */
+    #loginOverlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .login-card { background: #FFFFFF; border: 1px solid var(--border-darker); border-radius: 20px; padding: 36px; width: 100%; max-width: 420px; box-shadow: 0 24px 60px rgba(0,0,0,0.12); }
+
+    /* Layout: Fixed Sidebar (260px) + Main Content */
+    aside { width: 260px; background: var(--sidebar); border-right: 1px solid var(--border); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; z-index: 100; }
+    .sidebar-brand { padding: 24px 20px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--border); }
+    .logo-badge { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #635BFF, #8479FF); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 1.15rem; box-shadow: 0 4px 14px rgba(91, 77, 251, 0.35); flex-shrink: 0; }
+    .brand-title { font-size: 1.05rem; font-weight: 800; color: #1E2538; letter-spacing: -0.3px; line-height: 1.2; }
+    .brand-title small { font-size: 0.74rem; color: var(--muted); font-weight: 600; display: block; margin-top: 2px; }
+
+    .sidebar-menu { padding: 20px 14px; flex: 1; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+    .menu-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: #94A3B8; letter-spacing: 0.8px; padding: 14px 12px 6px; }
+    .nav-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 14px; border-radius: 12px; border: none; background: transparent; color: #64748B; font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; text-align: left; }
+    .nav-btn svg { width: 19px; height: 19px; stroke-width: 2.2; color: #94A3B8; transition: 0.15s; }
+    .nav-btn:hover { background: #F8FAFC; color: #1E2538; }
+    .nav-btn:hover svg { color: #5B4DFB; }
+    .nav-btn.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+    .nav-btn.active svg { color: var(--accent); }
+
+    .sidebar-footer { padding: 18px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .admin-pill { display: flex; align-items: center; gap: 10px; }
+    .admin-avatar { width: 36px; height: 36px; border-radius: 50%; background: #EEF0FF; color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.82rem; }
+    .admin-info { font-size: 0.85rem; font-weight: 700; color: #1E2538; line-height: 1.2; }
+    .admin-info small { color: var(--muted); font-size: 0.72rem; font-weight: 500; display: block; }
+
+    /* Main Container */
+    .app-main { margin-left: 260px; flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    header { height: 72px; border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 90; }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-title { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.3px; color: #1E2538; }
+    .status-live-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--success-soft); border: 1px solid var(--success-border); color: var(--success); font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 9999px; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+    .content-area { padding: 32px; max-width: 1400px; width: 100%; margin: 0 auto; flex: 1; }
+
+    /* Figma-Grade KPI Cards Strip */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 28px; }
+    .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 22px; display: flex; justify-content: space-between; align-items: flex-start; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 12px rgba(0,0,0,0.03); }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+    .kpi-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.6px; margin-bottom: 8px; }
+    .kpi-num { font-size: 1.85rem; font-weight: 800; color: #1E2538; letter-spacing: -0.5px; }
+    .kpi-icon-box { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .icon-indigo { background: var(--accent-soft); color: var(--accent); }
+    .icon-emerald { background: var(--success-soft); color: var(--success); }
+    .icon-amber { background: var(--warning-soft); color: #D97706; }
+    .icon-rose { background: var(--danger-soft); color: #E11D48; }
+
+    /* Trend Pill */
+    .trend-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; margin-top: 6px; }
+    .trend-pill.positive { background: var(--accent-soft); color: var(--accent); }
+    .trend-pill.negative { background: var(--danger-soft); color: var(--danger); }
+
+    /* Panels & Cards */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 26px; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.03); }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .panel-head h2 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.2px; color: #1E2538; }
+
+    /* Figma Button Hierarchy */
+    .btn { height: 42px; padding: 0 18px; border-radius: 10px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s ease; background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(91, 77, 251, 0.25); text-decoration: none; }
+    .btn:hover { background: var(--accent-hover); box-shadow: 0 6px 18px rgba(91, 77, 251, 0.35); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-sm { height: 34px; padding: 0 14px; font-size: 13px; border-radius: 8px; }
+    .btn-outline { background: #FFFFFF; border: 1px solid var(--border-darker); color: #475569; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .btn-outline:hover { background: #F8FAFC; border-color: #CBD5E1; color: #1E2538; transform: translateY(-1px); }
+    .btn-danger { background: var(--danger); box-shadow: 0 4px 12px rgba(255, 100, 124, 0.25); }
+    .btn-danger:hover { background: #E11D48; box-shadow: 0 6px 18px rgba(255, 100, 124, 0.35); }
+    .icon-btn { width: 34px; height: 34px; padding: 0; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-darker); background: #FFFFFF; color: #64748B; cursor: pointer; transition: 0.15s; }
+    .icon-btn:hover { background: #F8FAFC; color: var(--accent); border-color: #CBD5E1; }
+
+    /* Inputs, Selects & Forms */
+    .input, select, textarea { height: 42px; background: #F8FAFC; border: 1px solid var(--border-darker); color: #1E2538; padding: 0 14px; border-radius: 10px; font-size: 14px; outline: none; transition: all 0.15s ease; font-family: var(--font); }
+    textarea { height: auto; padding: 12px 14px; }
+    .input:focus, select:focus, textarea:focus { background: #FFFFFF; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(91, 77, 251, 0.15); }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .form-group label { font-size: 0.8rem; font-weight: 700; color: #64748B; }
+
+    /* Data Tables */
+    .table-container { width: 100%; overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); background: #FFFFFF; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px; }
+    th { background: #F8FAFC; color: #64748B; padding: 14px 18px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+    td { padding: 16px 18px; border-bottom: 1px solid #F1F4F8; color: #1E2538; font-weight: 500; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFBFC; }
+
+    /* Pill Badges */
+    .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; }
+    .badge-ACTIVE { background: var(--success-soft); color: var(--success); border: 1px solid var(--success-border); }
+    .badge-UNCLAIMED { background: var(--warning-soft); color: #D97706; border: 1px solid var(--warning-border); }
+    .badge-EXPIRED { background: var(--danger-soft); color: #E11D48; border: 1px solid var(--danger-border); }
+    .badge-REVOKED, .badge-SUSPENDED { background: #F1F5F9; color: #64748B; border: 1px solid #CBD5E1; }
+
+    .code-key { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.88rem; background: #EEF0FF; padding: 5px 10px; border-radius: 8px; color: var(--accent); border: 1px solid #D6D8FF; font-weight: 700; user-select: all; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    /* Modals with Glassmorphism */
+    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-box { background: #FFFFFF; border: 1px solid var(--border-darker); border-radius: 20px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 24px 60px rgba(0,0,0,0.15); }
+
+    @media (max-width: 900px) {
+      aside { width: 70px; }
+      .brand-title, .menu-label, .nav-btn span, .admin-info { display: none; }
+      .sidebar-brand { justify-content: center; padding: 20px 0; }
+      .nav-btn { justify-content: center; padding: 12px; }
+      .app-main { margin-left: 70px; }
+      .grid2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login Modal -->
+  <div id="loginOverlay">
+    <div class="login-card">
+      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 24px;">
+        <div class="logo-badge">LH</div>
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 800; color: #1E2538;">Admin Master Control</h2>
+          <p style="color: var(--muted); font-size: 0.82rem; margin-top: 2px;">Lead Hunter Licensing Engine v2.0</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Admin Username</label>
+        <input type="text" id="adminUser" class="input" placeholder="admin">
+      </div>
+      <div class="form-group">
+        <label>Master Password</label>
+        <input type="password" id="adminPass" class="input" placeholder="••••••••">
+      </div>
+      <button class="btn" id="btnLogin" style="width: 100%; margin-top: 10px;">
+        <svg style="width:18px;height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In to Console
+      </button>
+      <div id="loginErr" style="color: var(--danger); font-size: 0.85rem; margin-top: 12px; text-align: center; font-weight: 600;"></div>
+    </div>
+  </div>
+
+  <!-- Left Sidebar (260px) -->
+  <aside>
+    <div class="sidebar-brand">
+      <div class="logo-badge">LH</div>
+      <div class="brand-title">
+        Lead Hunter
+        <small>License Console v2.0</small>
+      </div>
+    </div>
+
+    <div class="sidebar-menu">
+      <div class="menu-label">Main Menu</div>
+      <button class="nav-btn active" data-tab="licenses">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <span>Licenses &amp; Keys</span>
+      </button>
+      <button class="nav-btn" data-tab="users">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <span>Customers &amp; Users</span>
+      </button>
+
+      <div class="menu-label">Growth &amp; Sales</div>
+      <button class="nav-btn" data-tab="invites">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        <span>Magic Invites</span>
+      </button>
+
+      <div class="menu-label">Support &amp; Audit</div>
+      <button class="nav-btn" data-tab="bugs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <span>Bug Inbox</span>
+      </button>
+      <button class="nav-btn" data-tab="logs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+        <span>Security Logs</span>
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="admin-pill">
+        <div class="admin-avatar">AD</div>
+        <div class="admin-info">
+          Master Admin
+          <small>Superuser</small>
+        </div>
+      </div>
+      <button class="icon-btn" id="btnLogout" title="Sign Out">
+        <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- App Main Content -->
+  <div class="app-main">
+    <header>
+      <div class="header-left">
+        <div class="header-title" id="pageTitle">License Management</div>
+        <div class="status-live-pill">
+          <div class="status-dot"></div> Server Online
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <!-- KPI Top Stats -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div>
+            <div class="kpi-title">Total Customers</div>
+            <div class="kpi-num" id="statUsers">0</div>
+            <div class="trend-pill positive">+12% vs last mo</div>
+          </div>
+          <div class="kpi-icon-box icon-indigo">
+            <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div>
+            <div class="kpi-title">Active Licenses</div>
+            <div class="kpi-num" id="statActiveLic">0</div>
+            <div class="trend-pill positive">+18% growth</div>
+          </div>
+          <div class="kpi-icon-box icon-emerald">
+            <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div>
+            <div class="kpi-title">Active Connected PCs</div>
+            <div class="kpi-num" id="statDevices">0</div>
+            <div class="trend-pill positive">Online Seats</div>
+          </div>
+          <div class="kpi-icon-box icon-amber">
+            <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div>
+            <div class="kpi-title">Open Bug Reports</div>
+            <div class="kpi-num" id="statBugs" style="color: #D97706;">0</div>
+            <div class="trend-pill negative" id="statBugsPill">Needs Review</div>
+          </div>
+          <div class="kpi-icon-box icon-rose">
+            <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 1: LICENSES & KEYS -->
+      <section id="tab-licenses" class="tab-content">
+        <div class="grid2">
+          <!-- Generate Single Key -->
+          <div class="panel">
+            <div class="panel-head"><h2>Generate Single License</h2></div>
+            <div class="grid2">
+              <div class="form-group">
+                <label>Plan Term</label>
+                <select id="singleTerm" class="input">
+                  <option value="1m">1 Month (30 Days)</option>
+                  <option value="3m">3 Months (90 Days)</option>
+                  <option value="6m">6 Months (180 Days)</option>
+                  <option value="1y">1 Year (365 Days)</option>
+                  <option value="lifetime">Lifetime Unlimited</option>
+                  <option value="custom">Custom Days</option>
+                </select>
+              </div>
+              <div class="form-group" id="customDaysGroup" style="display: none;">
+                <label>Custom Days Count</label>
+                <input type="number" id="singleCustomDays" class="input" placeholder="e.g. 45">
+              </div>
+              <div class="form-group">
+                <label>Device Limit (PCs)</label>
+                <input type="number" id="singleDevices" class="input" value="2" min="1" max="10">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Customer Name / Tag (Optional)</label>
+              <input type="text" id="singleCustomer" class="input" placeholder="e.g. Rahim Bhai / Giveaway Winner">
+            </div>
+            <button class="btn" id="btnCreateSingle">
+              <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Generate Key
+            </button>
+            <div id="singleResult" style="margin-top: 14px;"></div>
+          </div>
+
+          <!-- Bulk Generator -->
+          <div class="panel">
+            <div class="panel-head"><h2>Bulk Generator (Giveaways / Resellers)</h2></div>
+            <div class="grid2">
+              <div class="form-group">
+                <label>Number of Keys (Max 100)</label>
+                <input type="number" id="bulkCount" class="input" value="10" min="1" max="100">
+              </div>
+              <div class="form-group">
+                <label>Term</label>
+                <select id="bulkTerm" class="input">
+                  <option value="1m">1 Month</option>
+                  <option value="3m">3 Months</option>
+                  <option value="1y">1 Year</option>
+                  <option value="lifetime">Lifetime</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Batch Label</label>
+              <input type="text" id="bulkLabel" class="input" placeholder="e.g. Promo Batch #1">
+            </div>
+            <button class="btn btn-outline" id="btnCreateBulk">Generate Bulk Batch</button>
+            <div id="bulkResult" style="margin-top: 14px;"></div>
+          </div>
+        </div>
+
+        <!-- License Table -->
+        <div class="panel">
+          <div class="panel-head">
+            <h2>All License Keys</h2>
+            <div style="display: flex; gap: 10px;">
+              <input type="text" id="licSearch" class="input" placeholder="Search key, name, email..." style="width: 260px;">
+              <select id="licFilter" class="input">
+                <option value="all">All Statuses</option>
+                <option value="ACTIVE">Active</option>
+                <option value="UNCLAIMED">Unclaimed</option>
+                <option value="EXPIRED">Expired</option>
+                <option value="SUSPENDED">Suspended</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>License Key</th>
+                  <th>Customer / Notes</th>
+                  <th>Status</th>
+                  <th>Plan Term</th>
+                  <th>Device Slots</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="licTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: CUSTOMERS & USERS -->
+      <section id="tab-users" class="tab-content" style="display: none;">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Customer Accounts</h2>
+            <input type="text" id="userSearch" class="input" placeholder="Search customer email..." style="width: 260px;">
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Linked Key</th>
+                  <th>Devices</th>
+                  <th>Created</th>
+                  <th>Credentials &amp; Security</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: MAGIC INVITES -->
+      <section id="tab-invites" class="tab-content" style="display: none;">
+        <div class="grid2">
+          <div class="panel">
+            <div class="panel-head"><h2>Create Magic Onboarding Link</h2></div>
+            <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 16px;">
+              Send a personalized invite link to a buyer. They click it to enter their name &amp; password and automatically claim their license key.
+            </p>
+            <div class="form-group">
+              <label>Plan Term</label>
+              <select id="inviteTerm" class="input">
+                <option value="1m">1 Month (30 Days)</option>
+                <option value="3m">3 Months (90 Days)</option>
+                <option value="6m">6 Months</option>
+                <option value="1y">1 Year</option>
+                <option value="lifetime">Lifetime Unlimited</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Allowed PC Limit</label>
+              <input type="number" id="inviteDevices" class="input" value="2">
+            </div>
+            <button class="btn" id="btnGenInvite">
+              <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              Generate Magic Link
+            </button>
+            <div id="inviteResult" style="margin-top: 14px;"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h2>Active Invite Links</h2></div>
+            <div id="invitesListContainer">Loading...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: BUG REPORTS -->
+      <section id="tab-bugs" class="tab-content" style="display: none;">
+        <div class="panel">
+          <div class="panel-head"><h2>Extension Bug Reports</h2></div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Reported</th>
+                  <th>License Key</th>
+                  <th>Subject</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="bugsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: AUDIT LOGS -->
+      <section id="tab-logs" class="tab-content" style="display: none;">
+        <div class="panel">
+          <div class="panel-head"><h2>Security &amp; Activation Audit Log</h2></div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Event</th>
+                  <th>IP Address</th>
+                  <th>License Key</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Master Password Verification Modal (Required to reveal customer password) -->
+  <div id="revealModal" class="modal" style="display: none;">
+    <div class="modal-box">
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; color: #1E2538;">Authorize Sensitive Decryption</h3>
+      <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">
+        To reveal this customer's account password, enter your Superadmin Master Password to decrypt the AES-256-GCM envelope:
+      </p>
+      <div class="form-group">
+        <label>Master Password</label>
+        <input type="password" id="modalMasterPass" class="input" placeholder="••••••••">
+      </div>
+      <div id="modalErr" style="color: var(--danger); font-size: 0.85rem; margin-bottom: 12px; font-weight: 600;"></div>
+      <div id="revealedSecretBox" style="display: none; background: #EEF0FF; border: 1px solid #D6D8FF; padding: 14px; border-radius: 10px; margin-bottom: 16px;">
+        <div style="font-size: 0.75rem; color: #64748B; font-weight: 700; text-transform: uppercase;">Decrypted Password:</div>
+        <div id="revealedSecretVal" style="font-family: monospace; font-size: 1.2rem; font-weight: 800; color: #5B4DFB; margin-top: 4px; user-select: all;"></div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn btn-outline" id="btnCancelReveal">Close</button>
+        <button class="btn" id="btnConfirmReveal">Decrypt Password</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let token = localStorage.getItem('lh_admin_token') || '';
+    let currentTargetUserId = null;
+    const $ = (id) => document.getElementById(id);
+    const headers = () => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` });
+
+    function checkAuth() {
+      if (token) {
+        $('loginOverlay').style.display = 'none';
+        loadDashboard();
+      } else {
+        $('loginOverlay').style.display = 'flex';
+      }
+    }
+
+    $('btnLogin').addEventListener('click', async () => {
+      const username = $('adminUser').value.trim();
+      const password = $('adminPass').value;
+      const res = await fetch('/admin/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        token = data.token;
+        localStorage.setItem('lh_admin_token', token);
+        checkAuth();
+      } else {
+        $('loginErr').textContent = data.message || 'Invalid credentials';
+      }
+    });
+
+    $('btnLogout').addEventListener('click', () => {
+      localStorage.removeItem('lh_admin_token');
+      token = '';
+      checkAuth();
+    });
+
+    // Navigation Tab Switching
+    document.querySelectorAll('.nav-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach((tc) => tc.style.display = 'none');
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        $(`tab-${tab}`).style.display = 'block';
+        $('pageTitle').textContent = btn.querySelector('span').textContent;
+        if (tab === 'licenses') loadLicenses();
+        if (tab === 'users') loadUsers();
+        if (tab === 'invites') loadInvites();
+        if (tab === 'bugs') loadBugs();
+        if (tab === 'logs') loadLogs();
+      });
+    });
+
+    $('singleTerm').addEventListener('change', (e) => {
+      $('customDaysGroup').style.display = e.target.value === 'custom' ? 'block' : 'none';
+    });
+
+    $('btnCreateSingle').addEventListener('click', async () => {
+      const term = $('singleTerm').value;
+      const customDays = $('singleCustomDays').value;
+      const deviceLimit = $('singleDevices').value;
+      const customerName = $('singleCustomer').value;
+
+      $('btnCreateSingle').disabled = true;
+      $('btnCreateSingle').textContent = 'Generating...';
+      try {
+        const res = await fetch('/admin/api/licenses/create', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({ term, customDays, deviceLimit, customerName }),
+        });
+        if (res.status === 401) {
+          localStorage.removeItem('lh_admin_token');
+          token = '';
+          checkAuth();
+          alert('Session expired. Please sign in again.');
+          return;
+        }
+        const data = await res.json();
+        if (data.ok) {
+          $('singleResult').innerHTML = `
+            <div style="background:#E6F9F3; border:1px solid #B3F0DB; padding:14px; border-radius:12px; color:#00B074; font-size:0.9rem; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+              <div>
+                <b>Generated Key:</b> <span class="code-key" style="margin-left:6px;">${data.key}</span>
+              </div>
+              <button class="btn btn-sm" onclick="navigator.clipboard.writeText('${data.key}'); alert('Key copied to clipboard!');">Copy Key</button>
+            </div>`;
+          loadLicenses();
+          loadStats();
+        } else {
+          $('singleResult').innerHTML = `<div style="color:var(--danger); font-size:0.85rem; font-weight:600; margin-top:8px;">${data.message || 'Error creating license'}</div>`;
+        }
+      } catch (err) {
+        $('singleResult').innerHTML = '<div style="color:var(--danger); font-size:0.85rem; margin-top:8px;">Network connection error.</div>';
+      } finally {
+        $('btnCreateSingle').disabled = false;
+        $('btnCreateSingle').innerHTML = `<svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Generate Key`;
+      }
+    });
+
+    $('btnCreateBulk').addEventListener('click', async () => {
+      const count = $('bulkCount').value;
+      const term = $('bulkTerm').value;
+      const label = $('bulkLabel').value;
+
+      $('btnCreateBulk').disabled = true;
+      $('btnCreateBulk').textContent = 'Generating...';
+      try {
+        const res = await fetch('/admin/api/licenses/bulk-create', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({ count, term, label }),
+        });
+        if (res.status === 401) {
+          localStorage.removeItem('lh_admin_token');
+          token = '';
+          checkAuth();
+          alert('Session expired. Please sign in again.');
+          return;
+        }
+        const data = await res.json();
+        if (data.ok) {
+          $('bulkResult').innerHTML = `
+            <div style="background:#EEF0FF; border:1px solid #D6D8FF; padding:14px; border-radius:12px; color:#5B4DFB; font-size:0.85rem;">
+              Generated <b>${data.count} keys</b>! First Key: <code>${data.keys[0]}</code>
+            </div>`;
+          loadLicenses();
+          loadStats();
+        } else {
+          $('bulkResult').innerHTML = `<div style="color:var(--danger); font-size:0.85rem; margin-top:8px;">${data.message || 'Error generating batch'}</div>`;
+        }
+      } catch (err) {
+        $('bulkResult').innerHTML = '<div style="color:var(--danger); font-size:0.85rem; margin-top:8px;">Network error generating batch.</div>';
+      } finally {
+        $('btnCreateBulk').disabled = false;
+        $('btnCreateBulk').textContent = 'Generate Bulk Batch';
+      }
+    });
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/admin/api/stats', { headers: headers() });
+        if (res.status === 401) {
+          localStorage.removeItem('lh_admin_token');
+          token = '';
+          checkAuth();
+          return;
+        }
+        if (!res.ok) return;
+        const data = await res.json();
+        const stats = data.stats || data;
+        $('statUsers').textContent = stats.totalUsers ?? 0;
+        $('statActiveLic').textContent = stats.activeLicenses ?? 0;
+        $('statDevices').textContent = stats.activeDevices ?? 0;
+        $('statBugs').textContent = stats.openBugs ?? 0;
+        if (stats.openBugs === 0) {
+          $('statBugsPill').className = 'trend-pill positive';
+          $('statBugsPill').textContent = 'All Clear';
+        } else {
+          $('statBugsPill').className = 'trend-pill negative';
+          $('statBugsPill').textContent = `${stats.openBugs} Needs Review`;
+        }
+      } catch (e) {
+        console.warn('loadStats error:', e);
+      }
+    }
+
+    async function loadLicenses() {
+      try {
+        const res = await fetch('/admin/api/licenses', { headers: headers() });
+        if (res.status === 401) {
+          localStorage.removeItem('lh_admin_token');
+          token = '';
+          checkAuth();
+          return;
+        }
+        if (!res.ok) return;
+        const { licenses } = await res.json();
+        window.__licenses = licenses || [];
+        renderLicenses(window.__licenses);
+      } catch (e) {
+        console.warn('loadLicenses error:', e);
+      }
+    }
+
+    function renderLicenses(list) {
+      const tbody = $('licTableBody');
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px;">No licenses found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map((lic) => `
+        <tr>
+          <td><span class="code-key">${lic.license_key}</span></td>
+          <td>
+            <b>${lic.customer_name || 'Unassigned'}</b>
+            ${lic.admin_notes ? `<div style="font-size:0.75rem;color:var(--muted);">${lic.admin_notes}</div>` : ''}
+          </td>
+          <td><span class="badge badge-${lic.status}">${lic.status}</span></td>
+          <td>${lic.term === 'custom' ? `${lic.days} Days` : lic.term}</td>
+          <td>${lic.active_devices || 0} / ${lic.device_limit} PCs</td>
+          <td>
+            <button class="btn btn-sm btn-outline" onclick="changeStatus('${lic.id}', '${lic.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE'}')">
+              ${lic.status === 'ACTIVE' ? 'Suspend' : 'Activate'}
+            </button>
+            <button class="btn btn-sm btn-danger btn-outline" style="color:var(--danger);" onclick="changeStatus('${lic.id}', 'REVOKED')">
+              Revoke
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.changeStatus = async (id, status) => {
+      if (!confirm(`Are you sure you want to change status to ${status}?`)) return;
+      await fetch(`/admin/api/licenses/${id}/status`, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify({ status }),
+      });
+      loadLicenses();
+      loadStats();
+    };
+
+    $('licSearch').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      const filtered = (window.__licenses || []).filter(
+        (l) => l.license_key.toLowerCase().includes(q) || (l.customer_name && l.customer_name.toLowerCase().includes(q))
+      );
+      renderLicenses(filtered);
+    });
+
+    $('licFilter').addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (val === 'all') return renderLicenses(window.__licenses || []);
+      renderLicenses((window.__licenses || []).filter((l) => l.status === val));
+    });
+
+    async function loadUsers() {
+      const res = await fetch('/admin/api/users', { headers: headers() });
+      if (!res.ok) return;
+      const { users } = await res.json();
+      $('usersTableBody').innerHTML = users.map((u) => `
+        <tr>
+          <td>
+            <b>${u.name || 'Customer'}</b>
+            <div style="font-size:0.8rem;color:var(--muted);">${u.email}</div>
+          </td>
+          <td><span class="code-key">${u.license_key || 'None'}</span></td>
+          <td>${u.active_devices || 0} Connected</td>
+          <td>${new Date(u.created_at).toLocaleDateString()}</td>
+          <td>
+            <button class="btn btn-sm btn-outline" onclick="openReveal('${u.id}')">
+              <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              View Pass
+            </button>
+            <button class="btn btn-sm btn-outline" onclick="promptSetPass('${u.id}')">Set Pass</button>
+            <button class="btn btn-sm btn-outline" onclick="generateResetLink('${u.id}')">Magic Reset</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.openReveal = (userId) => {
+      currentTargetUserId = userId;
+      $('modalMasterPass').value = '';
+      $('modalErr').textContent = '';
+      $('revealedSecretBox').style.display = 'none';
+      $('revealModal').style.display = 'flex';
+    };
+
+    $('btnCancelReveal').addEventListener('click', () => {
+      $('revealModal').style.display = 'none';
+    });
+
+    $('btnConfirmReveal').addEventListener('click', async () => {
+      const masterPassword = $('modalMasterPass').value;
+      if (!masterPassword) return;
+      const res = await fetch(`/admin/api/users/${currentTargetUserId}/reveal-password`, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify({ masterPassword }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        $('revealedSecretVal').textContent = data.password;
+        $('revealedSecretBox').style.display = 'block';
+      } else {
+        $('modalErr').textContent = data.message || 'Decryption denied';
+      }
+    });
+
+    window.promptSetPass = async (userId) => {
+      const newPassword = prompt('Enter new password for this customer account (min 6 characters):');
+      if (!newPassword) return;
+      const res = await fetch(`/admin/api/users/${userId}/set-password`, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify({ newPassword }),
+      });
+      const data = await res.json();
+      alert(data.message);
+    };
+
+    window.generateResetLink = async (userId) => {
+      const res = await fetch(`/admin/api/users/${userId}/reset-link`, {
+        method: 'POST',
+        headers: headers(),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        navigator.clipboard.writeText(data.resetUrl);
+        alert(`Magic Password Reset Link generated and copied to clipboard!\n\n${data.resetUrl}\n\nSend this link to the customer to let them reset their password.`);
+      } else {
+        alert(data.message || 'Failed to generate reset link');
+      }
+    };
+
+    $('btnGenInvite').addEventListener('click', async () => {
+      const term = $('inviteTerm').value;
+      const deviceLimit = $('inviteDevices').value;
+
+      $('btnGenInvite').disabled = true;
+      $('btnGenInvite').textContent = 'Generating...';
+      try {
+        const res = await fetch('/admin/api/magic-invite', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({ term, deviceLimit }),
+        });
+        if (res.status === 401) {
+          localStorage.removeItem('lh_admin_token');
+          token = '';
+          checkAuth();
+          alert('Session expired. Please sign in again.');
+          return;
+        }
+        const data = await res.json();
+        if (data.ok) {
+          const magicUrl = data.inviteUrl || data.url || (location.origin + '/portal/setup?token=' + data.token);
+          $('inviteResult').innerHTML = `
+            <div style="background:#EEF0FF; border:1px solid #D6D8FF; padding:16px; border-radius:14px; margin-top:14px;">
+              <div style="font-size:0.75rem; color:#5B4DFB; font-weight:800; text-transform:uppercase;">Magic Onboarding URL:</div>
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <input type="text" class="input" value="${magicUrl}" readonly onclick="this.select()" style="background:#fff; flex:1;">
+                <button class="btn btn-sm" onclick="navigator.clipboard.writeText('${magicUrl}'); alert('Invite link copied to clipboard!');">Copy Link</button>
+              </div>
+              <div style="font-size:0.8rem; color:#64748B; margin-top:8px;">Key: <code>${data.licenseKey || ''}</code> (Expires in 7 days)</div>
+            </div>`;
+          loadInvites();
+        } else {
+          $('inviteResult').innerHTML = `<div style="color:var(--danger); font-size:0.85rem; margin-top:10px; font-weight:600;">${data.message || 'Error generating invite'}</div>`;
+        }
+      } catch (err) {
+        $('inviteResult').innerHTML = '<div style="color:var(--danger); font-size:0.85rem; margin-top:10px;">Network connection error.</div>';
+      } finally {
+        $('btnGenInvite').disabled = false;
+        $('btnGenInvite').innerHTML = `<svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Generate Magic Link`;
+      }
+    });
+
+    async function loadInvites() {
+      try {
+        const res = await fetch('/admin/api/magic-invites/active', { headers: headers() });
+        if (!res.ok) {
+          $('invitesListContainer').innerHTML = '<p style="color:var(--muted);font-size:0.85rem;">No active invite links.</p>';
+          return;
+        }
+        const data = await res.json();
+        const invites = data.invites || [];
+        if (invites.length === 0) {
+          $('invitesListContainer').innerHTML = '<p style="color:var(--muted);font-size:0.85rem;">No active invite links.</p>';
+          return;
+        }
+        $('invitesListContainer').innerHTML = invites.map((inv) => {
+          const invUrl = location.origin + '/portal/setup?token=' + inv.token;
+          return `
+            <div style="background:#F8FAFC; border:1px solid var(--border); padding:14px; border-radius:12px; margin-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b>Plan: ${inv.term} &bull; ${inv.device_limit} PCs</b>
+                <span class="badge badge-ACTIVE">Valid</span>
+              </div>
+              <div style="font-size:0.8rem; color:var(--muted); margin:6px 0;">Key: <code>${inv.license_key || 'Pending'}</code></div>
+              <button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText('${invUrl}'); alert('Copied!')">Copy Link</button>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.warn('loadInvites error:', e);
+      }
+    }
+
+    async function loadBugs() {
+      const res = await fetch('/admin/api/bugs', { headers: headers() });
+      if (!res.ok) return;
+      const { bugs } = await res.json();
+      $('bugsTableBody').innerHTML = bugs.map((b) => `
+        <tr>
+          <td>${new Date(b.created_at).toLocaleString()}</td>
+          <td><span class="code-key">${b.license_key || 'unknown'}</span></td>
+          <td><b>${b.title}</b></td>
+          <td style="font-size:0.85rem;max-width:320px;">${b.description}</td>
+          <td><span class="badge badge-${b.status === 'RESOLVED' ? 'ACTIVE' : 'UNCLAIMED'}">${b.status}</span></td>
+          <td>
+            <button class="btn btn-sm btn-outline" onclick="toggleBugStatus('${b.id}', '${b.status === 'OPEN' ? 'RESOLVED' : 'OPEN'}')">
+              ${b.status === 'OPEN' ? 'Mark Resolved' : 'Reopen'}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.toggleBugStatus = async (id, status) => {
+      await fetch(`/admin/api/bugs/${id}/status`, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify({ status }),
+      });
+      loadBugs();
+      loadStats();
+    };
+
+    async function loadLogs() {
+      const res = await fetch('/admin/api/audit-logs', { headers: headers() });
+      if (!res.ok) return;
+      const { logs } = await res.json();
+      $('logsTableBody').innerHTML = logs.map((l) => `
+        <tr>
+          <td>${new Date(l.created_at).toLocaleString()}</td>
+          <td><b>${l.event}</b></td>
+          <td><code>${l.ip}</code></td>
+          <td><span class="code-key">${l.license_key || '-'}</span></td>
+          <td style="font-size:0.8rem; color:var(--muted);">${l.details || ''}</td>
+        </tr>
+      `).join('');
+    }
+
+    function loadDashboard() {
+      loadStats();
+      loadLicenses();
+    }
+
+    checkAuth();
+  </script>
+</body>
+</html>
