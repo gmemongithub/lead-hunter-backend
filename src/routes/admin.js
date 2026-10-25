@@ -36,7 +36,7 @@ import fs from 'fs';
 import path from 'path';
 import { getDb } from '../db/database.js';
 import { CONFIG } from '../config.js';
-import { requireAdminAuth } from '../middleware/auth.js';
+import { requireAdminAuth, getMinExtensionVersion } from '../middleware/auth.js';
 import { generateLicenseKey, generateId, generateSecureToken } from '../crypto/keygen.js';
 import { encryptSensitive, decryptSensitive } from '../crypto/cipher.js';
 import { signAccessToken } from '../crypto/tokens.js';
@@ -70,6 +70,8 @@ router.get('/stats', requireAdminAuth, (req, res) => {
   const activeLicenses = db.prepare("SELECT COUNT(*) as c FROM licenses WHERE status = 'ACTIVE'").get().c;
   const activeDevices = db.prepare('SELECT COUNT(*) as c FROM devices').get().c;
   const openBugs = db.prepare("SELECT COUNT(*) as c FROM bug_reports WHERE status = 'OPEN'").get().c;
+  const totalDownloads = db.prepare('SELECT COUNT(*) as c FROM extension_downloads').get().c;
+  const uniqueDownloaders = db.prepare('SELECT COUNT(DISTINCT COALESCE(email, ip)) as c FROM extension_downloads').get().c;
 
   const stats = {
     totalUsers,
@@ -77,6 +79,8 @@ router.get('/stats', requireAdminAuth, (req, res) => {
     activeLicenses,
     activeDevices,
     openBugs,
+    totalDownloads,
+    uniqueDownloaders,
   };
 
   return res.json({
@@ -532,7 +536,46 @@ router.get('/extension/info', requireAdminAuth, (req, res) => {
   if (!fs.existsSync(filePath)) filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
   const exists = fs.existsSync(filePath);
   const release = row ? JSON.parse(row.value) : null;
-  return res.json({ ok: true, exists, release });
+  const minVersion = getMinExtensionVersion();
+  return res.json({ ok: true, exists, release, minVersion });
+});
+
+router.post('/extension/min-version', requireAdminAuth, (req, res) => {
+  const { version } = req.body || {};
+  if (!version || !/^\d+\.\d+\.\d+$/.test(version.trim())) {
+    return res.status(400).json({ error: 'BAD_REQUEST', message: 'Valid semantic version (e.g. 2.0.0) required.' });
+  }
+  const db = getDb();
+  db.prepare("INSERT OR REPLACE INTO system_settings (key, value) VALUES ('min_extension_version', ?)").run(version.trim());
+  return res.json({ ok: true, minVersion: version.trim() });
+});
+
+router.get('/extension/downloads', requireAdminAuth, (req, res) => {
+  const db = getDb();
+  const totalDownloads = db.prepare('SELECT COUNT(*) as c FROM extension_downloads').get().c;
+  const uniqueDownloaders = db.prepare('SELECT COUNT(DISTINCT COALESCE(email, ip)) as c FROM extension_downloads').get().c;
+
+  const userBreakdown = db.prepare(`
+    SELECT 
+      COALESCE(email, ip) as identifier,
+      MAX(user_id) as user_id,
+      COALESCE(email, 'Direct / ' || ip) as email,
+      COALESCE(MAX(customer_name), 'Anonymous') as customer_name,
+      COALESCE(MAX(license_key), 'N/A') as license_key,
+      COUNT(*) as download_count,
+      MAX(created_at) as last_downloaded_at,
+      MAX(ip) as last_ip
+    FROM extension_downloads
+    GROUP BY COALESCE(email, ip)
+    ORDER BY download_count DESC
+    LIMIT 100
+  `).all();
+
+  const recentLogs = db.prepare(`
+    SELECT * FROM extension_downloads ORDER BY created_at DESC LIMIT 50
+  `).all();
+
+  return res.json({ ok: true, totalDownloads, uniqueDownloaders, userBreakdown, recentLogs });
 });
 
 router.delete('/extension', requireAdminAuth, (req, res) => {

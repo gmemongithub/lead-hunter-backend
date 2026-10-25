@@ -50,7 +50,7 @@ export const CONFIG = {
   ENCRYPTION_MASTER_KEY: process.env.ENCRYPTION_MASTER_KEY || 'lh_master_secret_32bytes_key_0123456789',
   
   DB_PATH: process.env.DB_PATH || path.join(__dirname, '../data/license.db'),
-  MIN_EXTENSION_VERSION: process.env.MIN_EXTENSION_VERSION || '0.1.0',
+  MIN_EXTENSION_VERSION: process.env.MIN_EXTENSION_VERSION || '2.0.0',
   
   RATE_LIMIT_MAX: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),
   RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10),

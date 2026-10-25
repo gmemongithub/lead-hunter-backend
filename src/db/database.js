@@ -202,6 +202,19 @@ function createSchema() {
       value TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS extension_downloads (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      email TEXT NOT NULL,
+      customer_name TEXT,
+      license_key TEXT,
+      ip TEXT,
+      user_agent TEXT,
+      filename TEXT NOT NULL,
+      version TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_licenses_key ON licenses(license_key);
     CREATE INDEX IF NOT EXISTS idx_licenses_user ON licenses(user_id);
     CREATE INDEX IF NOT EXISTS idx_devices_license ON devices(license_id);
@@ -210,6 +223,10 @@ function createSchema() {
     CREATE INDEX IF NOT EXISTS idx_audit_time ON audit_logs(created_at);
     CREATE INDEX IF NOT EXISTS idx_support_user ON support_messages(user_id);
     CREATE INDEX IF NOT EXISTS idx_support_time ON support_messages(created_at);
+    CREATE INDEX IF NOT EXISTS idx_downloads_user ON extension_downloads(user_id);
+    CREATE INDEX IF NOT EXISTS idx_downloads_email ON extension_downloads(email);
+    CREATE INDEX IF NOT EXISTS idx_downloads_key ON extension_downloads(license_key);
+    CREATE INDEX IF NOT EXISTS idx_downloads_time ON extension_downloads(created_at);
   `;
 
   db.exec(schema);

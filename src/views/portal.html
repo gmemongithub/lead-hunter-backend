@@ -432,12 +432,18 @@ OR REVERSE-ENGINEERING THIS SOFTWARE OR ITS LICENSING MECHANISMS.
         $('loginOverlay').style.display = 'none';
         $('portalHeader').style.display = 'flex';
         $('portalMain').style.display = 'block';
+        if ($('btnDownloadExt')) {
+          $('btnDownloadExt').href = `/portal/api/extension/download?token=${encodeURIComponent(token)}`;
+        }
         loadAccount();
         loadSupportChat();
       } else {
         $('loginOverlay').style.display = 'flex';
         $('portalHeader').style.display = 'none';
         $('portalMain').style.display = 'none';
+        if ($('btnDownloadExt')) {
+          $('btnDownloadExt').href = '/portal/api/extension/download';
+        }
       }
     }
 

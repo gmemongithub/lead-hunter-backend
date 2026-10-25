@@ -34,7 +34,7 @@ import bcrypt from 'bcryptjs';
 import { getDb } from '../db/database.js';
 import { signAccessToken, signRefreshToken, verifyToken, generateWorkToken } from '../crypto/tokens.js';
 import { generateId } from '../crypto/keygen.js';
-import { requireExtensionAuth } from '../middleware/auth.js';
+import { requireExtensionAuth, enforceExtensionVersion } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rate-limit.js';
 
 const router = express.Router();
@@ -74,7 +74,7 @@ export function computeExpiry(term, customDays = null) {
  * 1. PURE KEY ACTIVATION (No email / name required from user!)
  * POST /api/v1/license/activate-key
  */
-router.post('/license/activate-key', rateLimiter({ max: 20 }), async (req, res) => {
+router.post('/license/activate-key', enforceExtensionVersion, rateLimiter({ max: 20 }), async (req, res) => {
   const { key, deviceId, deviceName = 'Chrome on PC', fingerprint = '' } = req.body || {};
   if (!key || !deviceId) {
     return res.status(400).json({ error: 'BAD_REQUEST', message: 'License key and Device ID are required.' });
@@ -178,7 +178,7 @@ router.post('/license/activate-key', rateLimiter({ max: 20 }), async (req, res) 
  * 2. EVICT DEVICE AND ACTIVATE NEW ONE
  * POST /api/v1/device/evict-and-activate
  */
-router.post('/device/evict-and-activate', rateLimiter({ max: 15 }), async (req, res) => {
+router.post('/device/evict-and-activate', enforceExtensionVersion, rateLimiter({ max: 15 }), async (req, res) => {
   const { key, deviceId, deviceName = 'Chrome on PC', evictDeviceId } = req.body || {};
   if (!key || !deviceId || !evictDeviceId) {
     return res.status(400).json({ error: 'BAD_REQUEST', message: 'Key, deviceId, and evictDeviceId are required.' });
@@ -234,7 +234,7 @@ router.post('/device/evict-and-activate', rateLimiter({ max: 15 }), async (req, 
  * 3. EMAIL & PASSWORD LOGIN
  * POST /api/v1/auth/login
  */
-router.post('/auth/login', rateLimiter({ max: 10 }), async (req, res) => {
+router.post('/auth/login', enforceExtensionVersion, rateLimiter({ max: 10 }), async (req, res) => {
   const { email, password, deviceId, deviceName = 'Chrome on PC' } = req.body || {};
   if (!email || !password || !deviceId) {
     return res.status(400).json({ error: 'BAD_REQUEST', message: 'Email, password, and deviceId are required.' });

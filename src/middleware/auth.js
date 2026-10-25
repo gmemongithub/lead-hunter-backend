@@ -47,10 +47,13 @@ export function requireExtensionAuth(req, res, next) {
 
   // Version enforcement (PRD Section 32)
   const extVer = req.headers['x-extension-version'];
-  if (extVer && isVersionLower(extVer, CONFIG.MIN_EXTENSION_VERSION)) {
+  const minVer = getMinExtensionVersion();
+  if (!extVer || isVersionLower(extVer, minVer)) {
     return res.status(426).json({
       error: 'UPDATE_REQUIRED',
-      message: `Your extension version (${extVer}) is deprecated. Minimum required is ${CONFIG.MIN_EXTENSION_VERSION}. Please update.`,
+      message: `Your extension version (${extVer || 'legacy'}) is deprecated and locked. Minimum required is ${minVer}. Please download the latest update from your portal.`,
+      minVersion: minVer,
+      currentVersion: extVer || 'legacy',
     });
   }
 
@@ -118,12 +121,36 @@ export function requirePortalAuth(req, res, next) {
   next();
 }
 
-function isVersionLower(current, minimum) {
-  const c = current.split('.').map(Number);
-  const m = minimum.split('.').map(Number);
+export function getMinExtensionVersion() {
+  try {
+    const db = getDb();
+    const row = db.prepare("SELECT value FROM system_settings WHERE key = 'min_extension_version'").get();
+    if (row && row.value) return row.value.trim();
+  } catch (_) {}
+  return CONFIG.MIN_EXTENSION_VERSION || '2.0.0';
+}
+
+export function isVersionLower(current, minimum) {
+  if (!current) return true;
+  const c = String(current).replace(/^v/i, '').split('.').map((x) => parseInt(x, 10) || 0);
+  const m = String(minimum).replace(/^v/i, '').split('.').map((x) => parseInt(x, 10) || 0);
   for (let i = 0; i < 3; i++) {
     if ((c[i] || 0) < (m[i] || 0)) return true;
     if ((c[i] || 0) > (m[i] || 0)) return false;
   }
   return false;
+}
+
+export function enforceExtensionVersion(req, res, next) {
+  const extVer = req.headers['x-extension-version'];
+  const minVer = getMinExtensionVersion();
+  if (!extVer || isVersionLower(extVer, minVer)) {
+    return res.status(426).json({
+      error: 'UPDATE_REQUIRED',
+      message: `Your extension version (${extVer || 'legacy'}) is deprecated and locked. Minimum required is ${minVer}. Please download the latest update from your portal.`,
+      minVersion: minVer,
+      currentVersion: extVer || 'legacy',
+    });
+  }
+  next();
 }

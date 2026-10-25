@@ -334,6 +334,17 @@ OR REVERSE-ENGINEERING THIS SOFTWARE OR ITS LICENSING MECHANISMS.
             <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
           </div>
         </div>
+
+        <div class="kpi-card">
+          <div>
+            <div class="kpi-title">Total Downloads</div>
+            <div class="kpi-num" id="statDownloads" style="color: #6366F1;">0</div>
+            <div class="trend-pill positive" id="statDownloadUsers">0 unique users</div>
+          </div>
+          <div class="kpi-icon-box icon-indigo">
+            <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          </div>
+        </div>
       </div>
 
       <!-- TAB 1: LICENSES & KEYS -->
@@ -559,7 +570,7 @@ OR REVERSE-ENGINEERING THIS SOFTWARE OR ITS LICENSING MECHANISMS.
         </div>
       </section>
 
-      <!-- TAB 5: EXTENSION RELEASES -->
+      <!-- TAB 5: EXTENSION RELEASES & DOWNLOAD ANALYTICS -->
       <section id="tab-releases" class="tab-content" style="display: none;">
         <div class="grid2">
           <!-- Current Release Card -->
@@ -567,6 +578,22 @@ OR REVERSE-ENGINEERING THIS SOFTWARE OR ITS LICENSING MECHANISMS.
             <div class="panel-head"><h2>Active Extension Package</h2></div>
             <div id="currentReleaseInfo">
               <div style="padding: 24px; text-align: center; color: var(--muted);">Checking active release...</div>
+            </div>
+
+            <!-- Version Enforcement Box -->
+            <div style="margin-top: 20px; padding: 18px; background: #F8FAFC; border: 1px solid var(--border); border-radius: 14px;">
+              <div style="font-weight: 700; font-size: 0.95rem; color: #1E2538; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Strict Minimum Version Lock
+              </div>
+              <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">
+                Any extension version lower than this minimum version is immediately locked out from scraping, activating, or logging in.
+              </p>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="minVersionInput" class="input" style="max-width: 140px;" placeholder="2.0.0">
+                <button class="btn btn-sm" id="btnSaveMinVersion">Set Minimum Version</button>
+              </div>
+              <div id="minVersionMsg" style="margin-top: 8px; font-size: 0.8rem; font-weight: 600;"></div>
             </div>
           </div>
 
@@ -578,7 +605,7 @@ OR REVERSE-ENGINEERING THIS SOFTWARE OR ITS LICENSING MECHANISMS.
             </p>
             <div class="form-group">
               <label>Version Name</label>
-              <input type="text" id="releaseVersion" class="input" placeholder="e.g. v2.4.0">
+              <input type="text" id="releaseVersion" class="input" placeholder="e.g. v2.0.0">
             </div>
             <div class="form-group">
               <label>Select Extension Zip File</label>
@@ -589,6 +616,62 @@ OR REVERSE-ENGINEERING THIS SOFTWARE OR ITS LICENSING MECHANISMS.
               Upload Extension Release
             </button>
             <div id="uploadStatusMsg" style="margin-top: 14px; font-size: 0.88rem; font-weight: 600;"></div>
+          </div>
+        </div>
+
+        <!-- Download Tracking & User Analytics -->
+        <div class="panel" style="margin-top: 24px;">
+          <div class="panel-head">
+            <div>
+              <h2>Extension Download Analytics &amp; User History</h2>
+              <p style="font-size: 0.82rem; color: var(--muted); margin-top: 2px;">
+                Track which customer downloaded the package, how many times each user downloaded, and real-time download logs.
+              </p>
+            </div>
+            <button class="btn btn-sm btn-outline" id="btnRefreshDownloads">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              Refresh Downloads
+            </button>
+          </div>
+
+          <!-- Per-User Download Table -->
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: #1E2538; margin: 16px 0 10px 0;">Downloads by User</h3>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Customer Name</th>
+                  <th>Email / Identifier</th>
+                  <th>License Key</th>
+                  <th>Downloads</th>
+                  <th>Last Downloaded</th>
+                  <th>Last IP</th>
+                </tr>
+              </thead>
+              <tbody id="userDownloadsTableBody">
+                <tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 24px;">Loading download statistics...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Recent Download Stream -->
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: #1E2538; margin: 24px 0 10px 0;">Recent Download Activity</h3>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>User / Email</th>
+                  <th>Customer</th>
+                  <th>Package File</th>
+                  <th>Version</th>
+                  <th>IP Address</th>
+                </tr>
+              </thead>
+              <tbody id="recentDownloadsTableBody">
+                <tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 24px;">No download records yet.</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -868,6 +951,8 @@ OR REVERSE-ENGINEERING THIS SOFTWARE OR ITS LICENSING MECHANISMS.
         $('statActiveLic').textContent = stats.activeLicenses ?? 0;
         $('statDevices').textContent = stats.activeDevices ?? 0;
         $('statBugs').textContent = stats.openBugs ?? 0;
+        $('statDownloads').textContent = stats.totalDownloads ?? 0;
+        $('statDownloadUsers').textContent = `${stats.uniqueDownloaders ?? 0} unique users`;
         if (stats.openBugs === 0) {
           $('statBugsPill').className = 'trend-pill positive';
           $('statBugsPill').textContent = 'All Clear';
@@ -1247,6 +1332,10 @@ OR REVERSE-ENGINEERING THIS SOFTWARE OR ITS LICENSING MECHANISMS.
       try {
         const res = await fetch('/admin/api/extension/info', { headers: headers() });
         const data = await res.json();
+        if ($('minVersionInput') && data.minVersion) {
+          $('minVersionInput').value = data.minVersion;
+        }
+
         const container = $('currentReleaseInfo');
         if (!data.exists || !data.release) {
           container.innerHTML = `
@@ -1255,6 +1344,7 @@ OR REVERSE-ENGINEERING THIS SOFTWARE OR ITS LICENSING MECHANISMS.
               <div style="font-weight: 700; color: #1E2538; font-size: 0.95rem;">No active package uploaded yet</div>
               <div style="font-size: 0.82rem; margin-top: 4px;">Upload your extension .zip using the form on the right.</div>
             </div>`;
+          loadDownloadsAnalytics();
           return;
         }
 
@@ -1279,10 +1369,85 @@ OR REVERSE-ENGINEERING THIS SOFTWARE OR ITS LICENSING MECHANISMS.
             </div>
           </div>
         `;
+        loadDownloadsAnalytics();
       } catch (e) {
         console.warn('loadReleaseInfo error:', e);
       }
     }
+
+    async function loadDownloadsAnalytics() {
+      try {
+        const res = await fetch('/admin/api/extension/downloads', { headers: headers() });
+        const data = await res.json();
+        if (!data.ok) return;
+
+        // Render User Breakdown
+        const uBody = $('userDownloadsTableBody');
+        if (!data.userBreakdown || !data.userBreakdown.length) {
+          uBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 24px;">No downloads recorded yet.</td></tr>';
+        } else {
+          uBody.innerHTML = data.userBreakdown.map((u) => `
+            <tr>
+              <td><b>${escapeHtml(u.customer_name || 'Anonymous')}</b></td>
+              <td><code>${escapeHtml(u.email || '-')}</code></td>
+              <td><code>${escapeHtml(u.license_key || 'N/A')}</code></td>
+              <td><span class="badge badge-ACTIVE" style="font-size: 0.8rem; font-weight: 800;">${u.download_count} times</span></td>
+              <td style="font-size: 0.82rem; color: var(--muted);">${new Date(u.last_downloaded_at).toLocaleString()}</td>
+              <td><code style="font-size: 0.78rem;">${escapeHtml(u.last_ip || '-')}</code></td>
+            </tr>
+          `).join('');
+        }
+
+        // Render Recent Logs
+        const rBody = $('recentDownloadsTableBody');
+        if (!data.recentLogs || !data.recentLogs.length) {
+          rBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 24px;">No download activity yet.</td></tr>';
+        } else {
+          rBody.innerHTML = data.recentLogs.map((log) => `
+            <tr>
+              <td style="font-size: 0.82rem; color: var(--muted);">${new Date(log.created_at).toLocaleString()}</td>
+              <td><code>${escapeHtml(log.email || '-')}</code></td>
+              <td>${escapeHtml(log.customer_name || 'Guest')}</td>
+              <td><b>${escapeHtml(log.filename || 'lead-hunter-pro.zip')}</b></td>
+              <td><span class="badge badge-ACTIVE">${escapeHtml(log.version || '2.0.0')}</span></td>
+              <td><code style="font-size: 0.78rem;">${escapeHtml(log.ip || '-')}</code></td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.warn('loadDownloadsAnalytics error:', err);
+      }
+    }
+
+    $('btnSaveMinVersion').addEventListener('click', async () => {
+      const ver = $('minVersionInput').value.trim();
+      if (!ver) return;
+      $('btnSaveMinVersion').disabled = true;
+      try {
+        const res = await fetch('/admin/api/extension/min-version', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({ version: ver }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          $('minVersionMsg').textContent = `Minimum required version set to ${data.minVersion}. Older extensions will be locked out.`;
+          $('minVersionMsg').style.color = 'var(--success)';
+        } else {
+          $('minVersionMsg').textContent = data.message || 'Failed to update';
+          $('minVersionMsg').style.color = 'var(--danger)';
+        }
+      } catch (e) {
+        $('minVersionMsg').textContent = 'Network error';
+        $('minVersionMsg').style.color = 'var(--danger)';
+      } finally {
+        $('btnSaveMinVersion').disabled = false;
+      }
+    });
+
+    $('btnRefreshDownloads').addEventListener('click', () => {
+      loadDownloadsAnalytics();
+    });
 
     $('btnUploadRelease').addEventListener('click', async () => {
       const fileInput = $('releaseFile');

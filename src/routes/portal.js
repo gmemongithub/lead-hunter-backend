@@ -38,7 +38,7 @@ import { CONFIG } from '../config.js';
 import { requirePortalAuth } from '../middleware/auth.js';
 import { generateLicenseKey, generateId } from '../crypto/keygen.js';
 import { encryptSensitive } from '../crypto/cipher.js';
-import { signAccessToken } from '../crypto/tokens.js';
+import { signAccessToken, verifyToken } from '../crypto/tokens.js';
 import { rateLimiter } from '../middleware/rate-limit.js';
 import { computeExpiry } from './api-v1.js';
 
@@ -374,6 +374,10 @@ router.post('/support/messages', requirePortalAuth, (req, res) => {
  */
 const releasesDir = path.join(process.cwd(), 'backend/data/releases');
 
+function getClientIp(req) {
+  return req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+}
+
 router.get('/extension/download', (req, res) => {
   let filePath = path.join(releasesDir, 'lead-hunter-pro.zip');
   if (!fs.existsSync(filePath)) {
@@ -382,9 +386,84 @@ router.get('/extension/download', (req, res) => {
   if (!fs.existsSync(filePath)) {
     return res.status(404).send('No extension package has been uploaded yet. Please contact administrator.');
   }
+
   const db = getDb();
   const row = db.prepare("SELECT value FROM system_settings WHERE key = 'extension_release'").get();
-  const filename = row ? JSON.parse(row.value).filename : 'lead-hunter-pro.zip';
+  const relMeta = row ? JSON.parse(row.value) : { filename: 'lead-hunter-pro.zip', version: '2.0.0' };
+  const filename = relMeta.filename || 'lead-hunter-pro.zip';
+
+  // Identify who is downloading
+  let token = req.query.token || req.headers.authorization?.replace(/^Bearer /i, '');
+  let key = req.query.key || req.query.license_key;
+  let email = req.query.email;
+  let userId = null;
+  let customerName = null;
+  let licenseKey = null;
+
+  if (token) {
+    const decoded = verifyToken(token);
+    if (decoded) {
+      userId = decoded.sub || decoded.id;
+      if (decoded.email) email = decoded.email;
+      if (decoded.key) licenseKey = decoded.key;
+    }
+  }
+
+  if (userId) {
+    const u = db.prepare('SELECT email, name FROM users WHERE id = ?').get(userId);
+    if (u) {
+      email = email || u.email;
+      customerName = customerName || u.name;
+    }
+  }
+
+  if (key) {
+    const l = db.prepare('SELECT * FROM licenses WHERE license_key = ?').get(key.trim().toUpperCase());
+    if (l) {
+      licenseKey = l.license_key;
+      customerName = customerName || l.customer_name;
+      if (l.user_id) userId = userId || l.user_id;
+    }
+  }
+
+  if (email && !customerName) {
+    const u = db.prepare('SELECT name, id FROM users WHERE email = ?').get(email.trim().toLowerCase());
+    if (u) {
+      customerName = u.name;
+      userId = userId || u.id;
+    }
+  }
+
+  if (userId && !licenseKey) {
+    const l = db.prepare("SELECT license_key, customer_name FROM licenses WHERE user_id = ? AND status != 'REVOKED' ORDER BY created_at DESC LIMIT 1").get(userId);
+    if (l) {
+      licenseKey = l.license_key;
+      customerName = customerName || l.customer_name;
+    }
+  }
+
+  const ip = getClientIp(req);
+  const userAgent = (req.headers['user-agent'] || '').slice(0, 250);
+  const userIdentifier = email || (key ? `Key: ${key}` : `Guest (${ip})`);
+  const finalName = customerName || (email ? email.split('@')[0] : 'Web User');
+  const finalKey = licenseKey || 'N/A';
+
+  try {
+    const downloadId = generateId('dl');
+    const now = Date.now();
+    db.prepare(`
+      INSERT INTO extension_downloads (id, user_id, email, customer_name, license_key, ip, user_agent, filename, version, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(downloadId, userId, userIdentifier, finalName, finalKey, ip, userAgent, filename, relMeta.version || '2.0.0', now);
+
+    db.prepare(`
+      INSERT INTO audit_logs (id, event, ip, license_key, details, created_at)
+      VALUES (?, 'EXTENSION_DOWNLOADED', ?, ?, ?, ?)
+    `).run(generateId('log'), ip, finalKey, JSON.stringify({ email: userIdentifier, name: finalName, version: relMeta.version, file: filename }), now);
+  } catch (err) {
+    console.warn('[Download Tracker Error]', err.message);
+  }
+
   return res.download(filePath, filename);
 });
 
