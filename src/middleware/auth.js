@@ -54,6 +54,28 @@ export function requireExtensionAuth(req, res, next) {
     });
   }
 
+  // Strict License & Device Active Checks (PRD Section 33)
+  if (decoded.lid) {
+    const db = getDb();
+    const license = db.prepare('SELECT status, expires_at FROM licenses WHERE id = ?').get(decoded.lid);
+    if (!license || license.status === 'REVOKED' || license.status === 'SUSPENDED') {
+      return res.status(403).json({ error: 'INVALID_LICENSE', message: 'License revoked or suspended.' });
+    }
+    if (license.expires_at && Date.now() > license.expires_at) {
+      return res.status(403).json({ error: 'EXPIRED', message: 'License has expired.' });
+    }
+
+    if (decoded.dev) {
+      const activeDevice = db.prepare('SELECT id FROM devices WHERE license_id = ? AND device_id = ?').get(decoded.lid, decoded.dev);
+      if (!activeDevice) {
+        return res.status(401).json({
+          error: 'DEVICE_EVICTED',
+          message: 'This device was disconnected because another device logged into your license.',
+        });
+      }
+    }
+  }
+
   req.auth = decoded;
   next();
 }

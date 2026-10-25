@@ -190,8 +190,12 @@ router.post('/device/evict-and-activate', rateLimiter({ max: 15 }), async (req, 
     return res.status(400).json({ error: 'INVALID_LICENSE', message: 'License is not active.' });
   }
 
-  // Remove evicted device
-  db.prepare('DELETE FROM devices WHERE license_id = ? AND device_id = ?').run(license.id, evictDeviceId);
+  // Remove evicted device(s)
+  if (license.device_limit === 1) {
+    db.prepare('DELETE FROM devices WHERE license_id = ?').run(license.id);
+  } else {
+    db.prepare('DELETE FROM devices WHERE license_id = ? AND device_id = ?').run(license.id, evictDeviceId);
+  }
   logAudit('DEVICE_EVICTED_BY_CLIENT', req, license.license_key, { evicted: evictDeviceId, by: deviceId });
 
   // Add new device
@@ -319,6 +323,15 @@ router.post('/license/verify', requireExtensionAuth, (req, res) => {
     return res.status(403).json({ error: 'EXPIRED', message: 'License has expired.' });
   }
 
+  // Active Device Enforcement: verify device still exists in devices table
+  const activeDevice = db.prepare('SELECT id FROM devices WHERE license_id = ? AND device_id = ?').get(lid, dev);
+  if (!activeDevice) {
+    return res.status(401).json({
+      error: 'DEVICE_EVICTED',
+      message: 'This device was disconnected because another device logged into your license.',
+    });
+  }
+
   // Update device heartbeat
   db.prepare('UPDATE devices SET last_seen_at = ?, ip = ? WHERE license_id = ? AND device_id = ?').run(now, getClientIp(req), lid, dev);
 
@@ -352,6 +365,27 @@ function handleRefresh(req, res) {
     return res.status(401).json({ error: 'INVALID_REFRESH', message: 'Invalid or expired refresh token.' });
   }
 
+  const db = getDb();
+  if (decoded.lid) {
+    const license = db.prepare('SELECT status, expires_at FROM licenses WHERE id = ?').get(decoded.lid);
+    if (!license || license.status === 'REVOKED' || license.status === 'SUSPENDED') {
+      return res.status(403).json({ error: 'INVALID_LICENSE', message: 'License revoked or suspended.' });
+    }
+    if (license.expires_at && Date.now() > license.expires_at) {
+      return res.status(403).json({ error: 'EXPIRED', message: 'License has expired.' });
+    }
+
+    if (decoded.dev) {
+      const activeDevice = db.prepare('SELECT id FROM devices WHERE license_id = ? AND device_id = ?').get(decoded.lid, decoded.dev);
+      if (!activeDevice) {
+        return res.status(401).json({
+          error: 'DEVICE_EVICTED',
+          message: 'This device was disconnected because another device logged into your license.',
+        });
+      }
+    }
+  }
+
   const tokenPayload = {
     sub: decoded.sub,
     lid: decoded.lid,
@@ -369,7 +403,38 @@ router.post('/session/refresh', handleRefresh);
 router.post('/auth/refresh', handleRefresh);
 
 /**
- * 6. SUBMIT BUG REPORT FROM EXTENSION
+ * 6. LOGOUT & DEVICE RELEASE
+ * POST /api/v1/auth/logout
+ */
+router.post('/auth/logout', (req, res) => {
+  const header = req.headers.authorization;
+  let dev = req.body?.deviceId;
+  let lid = null;
+
+  if (header && header.startsWith('Bearer ')) {
+    const token = header.slice(7).trim();
+    const decoded = verifyToken(token);
+    if (decoded) {
+      lid = decoded.lid;
+      dev = decoded.dev || dev;
+    }
+  }
+
+  if (dev) {
+    const db = getDb();
+    if (lid) {
+      db.prepare('DELETE FROM devices WHERE license_id = ? AND device_id = ?').run(lid, dev);
+    } else {
+      db.prepare('DELETE FROM devices WHERE device_id = ?').run(dev);
+    }
+    logAudit('DEVICE_LOGOUT', req, lid || 'unknown', { deviceId: dev });
+  }
+
+  return res.json({ ok: true, message: 'Logged out successfully and device slot released.' });
+});
+
+/**
+ * 7. SUBMIT BUG REPORT FROM EXTENSION
  * POST /api/v1/report/bug
  */
 router.post('/report/bug', rateLimiter({ max: 5 }), (req, res) => {
@@ -388,7 +453,7 @@ router.post('/report/bug', rateLimiter({ max: 5 }), (req, res) => {
 });
 
 /**
- * 7. GET DYNAMIC WORK TOKEN
+ * 8. GET DYNAMIC WORK TOKEN
  * GET /api/v1/work-token
  */
 router.get('/work-token', requireExtensionAuth, (req, res) => {
