@@ -375,20 +375,26 @@ router.post('/support/messages', requirePortalAuth, (req, res) => {
 const releasesDir = path.join(process.cwd(), 'backend/data/releases');
 
 router.get('/extension/download', (req, res) => {
-  const filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
+  let filePath = path.join(releasesDir, 'lead-hunter-pro.zip');
+  if (!fs.existsSync(filePath)) {
+    filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
+  }
   if (!fs.existsSync(filePath)) {
     return res.status(404).send('No extension package has been uploaded yet. Please contact administrator.');
   }
   const db = getDb();
   const row = db.prepare("SELECT value FROM system_settings WHERE key = 'extension_release'").get();
-  const filename = row ? JSON.parse(row.value).filename : 'Lead-Hunter-Latest.zip';
+  const filename = row ? JSON.parse(row.value).filename : 'lead-hunter-pro.zip';
   return res.download(filePath, filename);
 });
 
 router.get('/extension/info', (req, res) => {
   const db = getDb();
   const row = db.prepare("SELECT value FROM system_settings WHERE key = 'extension_release'").get();
-  const filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
+  let filePath = path.join(releasesDir, 'lead-hunter-pro.zip');
+  if (!fs.existsSync(filePath)) {
+    filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
+  }
   const exists = fs.existsSync(filePath);
   const release = row ? JSON.parse(row.value) : null;
   return res.json({ ok: true, exists, release });

@@ -501,30 +501,34 @@ router.post('/extension/upload', requireAdminAuth, (req, res) => {
   if (!req.body || !req.body.length) {
     return res.status(400).json({ error: 'BAD_REQUEST', message: 'No file received.' });
   }
-  const filename = req.headers['x-filename'] || 'Lead-Hunter-Latest.zip';
+  const filename = req.headers['x-filename'] || 'lead-hunter-pro.zip';
   const version = req.headers['x-version'] || '2.0.0';
-  const filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
+  const filePath = path.join(releasesDir, 'lead-hunter-pro.zip');
   fs.writeFileSync(filePath, req.body);
+  fs.writeFileSync(path.join(releasesDir, 'lead-hunter-latest.zip'), req.body);
 
   const db = getDb();
   const now = Date.now();
-  const meta = JSON.stringify({ filename, version, uploaded_at: now, size: req.body.length });
+  const meta = JSON.stringify({ filename: 'lead-hunter-pro.zip', version, uploaded_at: now, size: req.body.length });
   db.prepare("INSERT OR REPLACE INTO system_settings (key, value) VALUES ('extension_release', ?)").run(meta);
-  return res.json({ ok: true, filename, version, size: req.body.length });
+  return res.json({ ok: true, filename: 'lead-hunter-pro.zip', version, size: req.body.length });
 });
 
 router.get('/extension/info', requireAdminAuth, (req, res) => {
   const db = getDb();
   const row = db.prepare("SELECT value FROM system_settings WHERE key = 'extension_release'").get();
-  const filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
+  let filePath = path.join(releasesDir, 'lead-hunter-pro.zip');
+  if (!fs.existsSync(filePath)) filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
   const exists = fs.existsSync(filePath);
   const release = row ? JSON.parse(row.value) : null;
   return res.json({ ok: true, exists, release });
 });
 
 router.delete('/extension', requireAdminAuth, (req, res) => {
-  const filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
-  if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  const f1 = path.join(releasesDir, 'lead-hunter-pro.zip');
+  const f2 = path.join(releasesDir, 'lead-hunter-latest.zip');
+  if (fs.existsSync(f1)) fs.unlinkSync(f1);
+  if (fs.existsSync(f2)) fs.unlinkSync(f2);
   const db = getDb();
   db.prepare("DELETE FROM system_settings WHERE key = 'extension_release'").run();
   return res.json({ ok: true, message: 'Extension release deleted.' });
