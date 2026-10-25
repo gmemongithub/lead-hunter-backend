@@ -63,7 +63,7 @@ app.use((err, req, res, next) => {
 async function startServer() {
   try {
     await initDatabase();
-    app.listen(CONFIG.PORT, () => {
+    app.listen(CONFIG.PORT, '0.0.0.0', () => {
       console.log(`=======================================================`);
       console.log(`🚀 Lead Hunter Enterprise License Server running!`);
       console.log(`📡 URL: ${CONFIG.APP_URL}`);
