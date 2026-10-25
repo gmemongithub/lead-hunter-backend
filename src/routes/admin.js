@@ -264,7 +264,8 @@ function handleCreateInvite(req, res) {
     VALUES (?, ?, 'invite', ?, ?, ?)
   `).run(inviteId, token, licenseId, expiresAt, now);
 
-  const inviteUrl = `${CONFIG.APP_URL}/portal/setup?token=${token}`;
+  const baseUrl = req.get('host') ? `${req.protocol}://${req.get('host')}` : CONFIG.APP_URL;
+  const inviteUrl = `${baseUrl}/portal/setup?token=${token}`;
   return res.json({ ok: true, inviteUrl, url: inviteUrl, token, licenseKey: key, expiresAt });
 }
 router.post('/invites/create', requireAdminAuth, handleCreateInvite);
