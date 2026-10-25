@@ -1499,7 +1499,7 @@ OR REVERSE-ENGINEERING THIS SOFTWARE OR ITS LICENSING MECHANISMS.
       const res = await fetch(`/admin/api/users/${currentTargetUserId}/reveal-password`, {
         method: 'POST',
         headers: headers(),
-        body: JSON.stringify({ masterPassword }),
+        body: JSON.stringify({ masterPassword, adminPassword: masterPassword }),
       });
       const data = await res.json();
       if (data.ok) {

@@ -231,9 +231,10 @@ router.get('/users', requireAdminAuth, (req, res) => {
  */
 router.post('/users/:id/reveal-password', requireAdminAuth, (req, res) => {
   const { id } = req.params;
-  const { adminPassword } = req.body || {};
+  const { adminPassword, masterPassword } = req.body || {};
+  const passAttempt = (masterPassword || adminPassword || '').trim();
 
-  if (!adminPassword || adminPassword !== CONFIG.ADMIN_PASSWORD) {
+  if (!passAttempt || passAttempt !== CONFIG.ADMIN_PASSWORD) {
     return res.status(403).json({ error: 'FORBIDDEN', message: 'Incorrect Admin Master Password. Access denied.' });
   }
 
@@ -242,7 +243,7 @@ router.post('/users/:id/reveal-password', requireAdminAuth, (req, res) => {
   if (!user) return res.status(404).json({ error: 'NOT_FOUND', message: 'User not found.' });
 
   try {
-    const plainPassword = decryptSensitive(user.password_enc, adminPassword);
+    const plainPassword = decryptSensitive(user.password_enc, passAttempt);
     return res.json({ ok: true, email: user.email, password: plainPassword });
   } catch (err) {
     return res.status(500).json({ error: 'DECRYPTION_ERROR', message: err.message });
