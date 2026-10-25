@@ -851,7 +851,7 @@
         }
         const data = await res.json();
         if (data.ok) {
-          const magicUrl = data.inviteUrl || data.url || (location.origin + '/portal/setup?token=' + data.token);
+          const magicUrl = location.origin + '/portal/setup?token=' + data.token;
           $('inviteResult').innerHTML = `
             <div style="background:#EEF0FF; border:1px solid #D6D8FF; padding:16px; border-radius:14px; margin-top:14px;">
               <div style="font-size:0.75rem; color:#5B4DFB; font-weight:800; text-transform:uppercase;">Magic Onboarding URL:</div>
