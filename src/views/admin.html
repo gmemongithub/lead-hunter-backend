@@ -35,8 +35,8 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); -webkit-font-smoothing: antialiased; }
     body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; overflow-x: hidden; }
 
-    /* Login Modal Overlay */
-    #loginOverlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    /* Login Modal Overlay - 100% Opaque, Solid Security Barrier */
+    #loginOverlay { position: fixed; inset: 0; background: #0B0F19; display: flex; align-items: center; justify-content: center; z-index: 99999; }
     .login-card { background: #FFFFFF; border: 1px solid var(--border-darker); border-radius: 20px; padding: 36px; width: 100%; max-width: 420px; box-shadow: 0 24px 60px rgba(0,0,0,0.12); }
 
     /* Layout: Fixed Sidebar (260px) + Main Content */
@@ -172,8 +172,8 @@
     </div>
   </div>
 
-  <!-- Left Sidebar (260px) -->
-  <aside>
+  <!-- Left Sidebar (260px) - Hidden until authenticated -->
+  <aside id="appSidebar" style="display: none;">
     <div class="sidebar-brand">
       <div class="logo-badge">LH</div>
       <div class="brand-title">
@@ -224,8 +224,8 @@
     </div>
   </aside>
 
-  <!-- App Main Content -->
-  <div class="app-main">
+  <!-- App Main Content - Hidden until authenticated -->
+  <div class="app-main" id="appMain" style="display: none;">
     <header>
       <div class="header-left">
         <div class="header-title" id="pageTitle">License Management</div>
@@ -518,9 +518,13 @@
     function checkAuth() {
       if (token) {
         $('loginOverlay').style.display = 'none';
+        $('appSidebar').style.display = 'flex';
+        $('appMain').style.display = 'block';
         loadDashboard();
       } else {
         $('loginOverlay').style.display = 'flex';
+        $('appSidebar').style.display = 'none';
+        $('appMain').style.display = 'none';
       }
     }
 

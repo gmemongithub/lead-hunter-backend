@@ -33,8 +33,8 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); -webkit-font-smoothing: antialiased; }
     body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
-    /* Login Modal Overlay */
-    #loginOverlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+    /* Login Modal Overlay - 100% Solid Opaque Barrier */
+    #loginOverlay { position: fixed; inset: 0; background: #0B0F19; display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 20px; }
     .login-card { background: #FFFFFF; border: 1px solid var(--border-darker); border-radius: 20px; padding: 36px; width: 100%; max-width: 420px; box-shadow: 0 24px 60px rgba(0,0,0,0.12); }
 
     /* Header */
@@ -150,8 +150,8 @@
     </div>
   </div>
 
-  <!-- Header -->
-  <header>
+  <!-- Header - Hidden until authenticated -->
+  <header id="portalHeader" style="display: none;">
     <div class="header-brand">
       <div class="logo-badge">LH</div>
       <div class="brand-title">
@@ -171,8 +171,8 @@
     </div>
   </header>
 
-  <!-- Main View -->
-  <main>
+  <!-- Main View - Hidden until authenticated -->
+  <main id="portalMain" style="display: none;">
     <div style="margin-bottom: 24px;">
       <h1 class="section-title">License &amp; Connected Devices</h1>
       <p class="section-desc">Manage your subscription, active PCs, security tokens, and account profile.</p>
@@ -331,9 +331,13 @@
     function checkAuth() {
       if (token) {
         $('loginOverlay').style.display = 'none';
+        $('portalHeader').style.display = 'flex';
+        $('portalMain').style.display = 'block';
         loadAccount();
       } else {
         $('loginOverlay').style.display = 'flex';
+        $('portalHeader').style.display = 'none';
+        $('portalMain').style.display = 'none';
       }
     }
 
