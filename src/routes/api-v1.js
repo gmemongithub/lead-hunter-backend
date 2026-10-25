@@ -98,11 +98,11 @@ router.post('/license/activate-key', rateLimiter({ max: 20 }), async (req, res) 
   const now = Date.now();
   let expiresAt = license.expires_at;
 
-  // If first time activating an UNCLAIMED key, compute its countdown timer!
-  if (license.status === 'UNCLAIMED') {
+  // If first time activating an UNCLAIMED key or missing expires_at, compute countdown timer!
+  if (license.status === 'UNCLAIMED' || !license.expires_at) {
     expiresAt = computeExpiry(license.term, license.days);
     db.prepare(`
-      UPDATE licenses SET status = 'ACTIVE', activated_at = ?, expires_at = ?, updated_at = ? WHERE id = ?
+      UPDATE licenses SET status = 'ACTIVE', activated_at = COALESCE(activated_at, ?), expires_at = ?, updated_at = ? WHERE id = ?
     `).run(now, expiresAt, now, license.id);
     license.status = 'ACTIVE';
     license.expires_at = expiresAt;
@@ -166,6 +166,7 @@ router.post('/license/activate-key', rateLimiter({ max: 20 }), async (req, res) 
       key: license.license_key,
       status: license.status,
       term: license.term,
+      days: license.days,
       expiresAt: license.expires_at,
       deviceLimit: license.device_limit,
       customerName: license.customer_name || 'Valued User',
@@ -218,6 +219,7 @@ router.post('/device/evict-and-activate', rateLimiter({ max: 15 }), async (req, 
       key: license.license_key,
       status: license.status,
       term: license.term,
+      days: license.days,
       expiresAt: license.expires_at,
       deviceLimit: license.device_limit,
     },
@@ -292,6 +294,7 @@ router.post('/auth/login', rateLimiter({ max: 10 }), async (req, res) => {
       key: license.license_key,
       status: license.status,
       term: license.term,
+      days: license.days,
       expiresAt: license.expires_at,
       deviceLimit: license.device_limit,
     },
@@ -328,6 +331,7 @@ router.post('/license/verify', requireExtensionAuth, (req, res) => {
       key: license.license_key,
       status: license.status,
       term: license.term,
+      days: license.days,
       expiresAt: license.expires_at,
       deviceLimit: license.device_limit,
       customerName: license.customer_name || 'Valued User',

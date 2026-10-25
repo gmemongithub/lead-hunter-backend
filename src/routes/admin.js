@@ -183,8 +183,18 @@ router.post('/licenses/:id/status', requireAdminAuth, (req, res) => {
   }
 
   const db = getDb();
-  db.prepare('UPDATE licenses SET status = ?, updated_at = ? WHERE id = ?').run(status, Date.now(), id);
-  return res.json({ ok: true, status });
+  const lic = db.prepare('SELECT * FROM licenses WHERE id = ?').get(id);
+  if (!lic) return res.status(404).json({ error: 'NOT_FOUND', message: 'License not found.' });
+
+  const now = Date.now();
+  let expiresAt = lic.expires_at;
+  if (status === 'ACTIVE' && (!expiresAt || (lic.term !== 'lifetime' && expiresAt <= now))) {
+    expiresAt = computeExpiry(lic.term, lic.days);
+    db.prepare('UPDATE licenses SET status = ?, expires_at = ?, activated_at = COALESCE(activated_at, ?), updated_at = ? WHERE id = ?').run(status, expiresAt, now, now, id);
+  } else {
+    db.prepare('UPDATE licenses SET status = ?, updated_at = ? WHERE id = ?').run(status, now, id);
+  }
+  return res.json({ ok: true, status, expiresAt });
 });
 
 /**
