@@ -15,8 +15,9 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.raw({ type: 'application/octet-stream', limit: '100mb' }));
 
 // Serve HTML Dashboards (No-cache so user changes reflect immediately)
 const viewsDir = path.join(__dirname, 'src/views');
@@ -26,7 +27,8 @@ const sendNoCache = (file) => (req, res) => {
   res.setHeader('Expires', '0');
   res.sendFile(path.join(viewsDir, file));
 };
-app.get('/admin', sendNoCache('admin.html'));
+app.get(`/${CONFIG.ADMIN_SLUG}`, sendNoCache('admin.html'));
+app.get('/admin', (req, res) => res.redirect(`/${CONFIG.ADMIN_SLUG}`));
 app.get('/portal', sendNoCache('portal.html'));
 app.get('/portal/setup', sendNoCache('setup.html'));
 app.get('/portal/reset-password', sendNoCache('reset.html'));
@@ -47,6 +49,7 @@ app.get('/health', (req, res) => {
 
 // Mount API Routers
 app.use('/api/v1', apiV1Router);
+app.use(`/${CONFIG.ADMIN_SLUG}/api`, adminRouter);
 app.use('/admin/api', adminRouter);
 app.use('/portal/api', portalRouter);
 

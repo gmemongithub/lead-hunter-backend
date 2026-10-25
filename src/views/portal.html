@@ -38,7 +38,7 @@
     .login-card { background: #FFFFFF; border: 1px solid var(--border-darker); border-radius: 20px; padding: 36px; width: 100%; max-width: 420px; box-shadow: 0 24px 60px rgba(0,0,0,0.12); }
 
     /* Header */
-    header { height: 72px; border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 90; }
+    header { height: 72px; border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 90; }
     .header-brand { display: flex; align-items: center; gap: 14px; text-decoration: none; color: inherit; }
     .logo-badge { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #635BFF, #8479FF); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 1.15rem; box-shadow: 0 4px 14px rgba(91, 77, 251, 0.35); flex-shrink: 0; }
     .brand-title { font-size: 1.05rem; font-weight: 800; color: #1E2538; letter-spacing: -0.3px; line-height: 1.2; }
@@ -86,8 +86,12 @@
     .btn-outline:hover { background: #F8FAFC; border-color: #CBD5E1; color: #1E2538; transform: translateY(-1px); }
     .btn-danger { background: var(--danger); box-shadow: 0 4px 12px rgba(255, 100, 124, 0.25); }
     .btn-danger:hover { background: #E11D48; box-shadow: 0 6px 18px rgba(255, 100, 124, 0.35); }
-    .btn-warning-outline { background: #FFFFFF; border: 1px solid #FDE68A; color: #D97706; }
+    .btn-warning-outline { background: #FFFFFF; border: 1.5px solid #FDE68A; color: #D97706; }
     .btn-warning-outline:hover { background: var(--warning-soft); border-color: #F59E0B; }
+
+    /* WhatsApp Button */
+    .btn-whatsapp { background: #F0FDF4 !important; border: 1.5px solid #BBF7D0 !important; color: #16A34A !important; font-weight: 700; width: 100%; margin-top: 12px; }
+    .btn-whatsapp:hover { background: #DCFCE7 !important; border-color: #86EFAC !important; color: #15803D !important; }
 
     /* Inputs */
     .input, textarea { height: 42px; background: #F8FAFC; border: 1px solid var(--border-darker); color: #1E2538; padding: 0 14px; border-radius: 10px; font-size: 14px; outline: none; transition: all 0.15s ease; width: 100%; font-family: var(--font); }
@@ -98,7 +102,7 @@
 
     /* License Key Box */
     .key-box-container { display: flex; align-items: center; gap: 12px; background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; }
-    .code-key { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 1.15rem; color: var(--accent); font-weight: 800; letter-spacing: 1px; flex: 1; user-select: all; }
+    .code-key { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 1.15rem; color: var(--accent); font-weight: 800; letter-spacing: 2px; flex: 1; user-select: all; }
 
     /* Pill Badges */
     .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -118,13 +122,19 @@
     .banner-warning svg { color: #D97706; flex-shrink: 0; margin-top: 2px; }
     .banner-warning p { font-size: 0.86rem; color: #92400E; line-height: 1.45; }
 
+    /* Chat Widget in Portal */
+    .portal-chat-box { background: #F8FAFC; border: 1px solid var(--border); border-radius: 14px; height: 320px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+    .portal-chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 0.88rem; line-height: 1.4; word-break: break-word; }
+    .portal-chat-bubble.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 2px; }
+    .portal-chat-bubble.admin { align-self: flex-start; background: #FFFFFF; border: 1px solid var(--border-darker); color: #1E2538; border-bottom-left-radius: 2px; }
+
     .text-muted { color: var(--muted); }
     .text-sm { font-size: 0.85rem; }
   </style>
 </head>
 <body>
 
-  <!-- Login Modal Overlay -->
+  <!-- Login Modal Overlay - 100% Solid Opaque Barrier -->
   <div id="loginOverlay">
     <div class="login-card">
       <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 24px;">
@@ -147,6 +157,14 @@
         Sign In to Portal
       </button>
       <div id="loginErr" style="color: var(--danger); font-size: 0.85rem; margin-top: 12px; text-align: center; font-weight: 600;"></div>
+
+      <div style="margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border); text-align: center;">
+        <div style="font-size: 0.8rem; color: var(--muted); margin-bottom: 8px;">Don't have a license key yet?</div>
+        <a href="#" id="loginWhatsappBtn" target="_blank" class="btn btn-whatsapp">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+          Get License Key via WhatsApp
+        </a>
+      </div>
     </div>
   </div>
 
@@ -175,7 +193,7 @@
   <main id="portalMain" style="display: none;">
     <div style="margin-bottom: 24px;">
       <h1 class="section-title">License &amp; Connected Devices</h1>
-      <p class="section-desc">Manage your subscription, active PCs, security tokens, and account profile.</p>
+      <p class="section-desc">Manage your subscription, active PCs, security tokens, and customer support.</p>
     </div>
 
     <!-- KPI Summary Grid -->
@@ -214,8 +232,8 @@
 
       <div class="kpi-card">
         <div>
-          <div class="kpi-title">Emergency Resets Left</div>
-          <div class="kpi-num" id="regenRemaining">-</div>
+          <div class="kpi-title">Regenerations Done</div>
+          <div class="kpi-num" id="regenCount">-</div>
         </div>
         <div class="kpi-icon-box icon-rose">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
@@ -223,44 +241,96 @@
       </div>
     </div>
 
-    <!-- Active License Key & Leak Recovery -->
+    <!-- Active License Key & Regeneration Section -->
     <div class="grid2">
+      <!-- Active Masked License Key -->
       <div class="panel">
         <div class="panel-head">
           <h2>Active Extension License Key</h2>
         </div>
         <p class="text-sm text-muted" style="margin-bottom: 14px;">
-          Use this license key inside the Lead Hunter Chrome Extension to activate your scraping seat:
+          For security, your key is masked. Use the Copy button to copy the full activation key directly into your extension:
         </p>
         <div class="key-box-container">
-          <span class="code-key" id="licKeyDisplay">LH-XXXX-XXXX-XXXX</span>
+          <span class="code-key" id="licKeyDisplay">LH••••••••0C</span>
           <button class="btn btn-sm" id="btnCopyKey">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy
+            Copy Full Key
           </button>
         </div>
         <p class="text-sm text-muted">
-          Paste into Chrome Extension &rarr; Settings &amp; License &rarr; Activate.
+          Paste inside Chrome Extension &rarr; Settings &amp; License &rarr; Activate Key.
         </p>
       </div>
 
+      <!-- 3-Day Regeneration Cooldown Card -->
       <div class="panel">
         <div class="panel-head">
           <h2 style="color: #D97706; display: flex; align-items: center; gap: 8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            Key Leaked? Regenerate
+            Key Leaked? Regenerate (3-Day Cooldown)
           </h2>
         </div>
         <div class="banner-warning">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <p>
-            If your license key was accidentally shared or compromised, revoking it will disconnect all existing devices immediately and issue a clean, fresh key.
+          <p id="regenWarningText">
+            If your key was compromised, generating a new key will instantly revoke your old key and disconnect all active PCs. You can generate a new key <b>once every 3 days</b>.
           </p>
         </div>
-        <button class="btn btn-warning-outline" id="btnRegenerateKey">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38l-5.67-5.67"/></svg>
-          Revoke &amp; Generate New Key
-        </button>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button class="btn btn-warning-outline" id="btnRegenerateKey">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38l-5.67-5.67"/></svg>
+            Revoke Old &amp; Generate New Key
+          </button>
+          <div id="regenCooldownNotice" style="font-size: 0.8rem; color: #D97706; font-weight: 600;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Extension Download & Live Support Split -->
+    <div class="grid2">
+      <!-- Download Chrome Extension -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Download Lead Hunter Extension (.zip)</h2>
+        </div>
+        <p class="text-sm text-muted" style="margin-bottom: 16px;">
+          Download the official Lead Hunter extension package to install on your Chrome browser:
+        </p>
+        <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px;">
+          <div>
+            <b id="extReleaseVersion" style="font-size: 1.05rem; color: #1E2538;">Lead Hunter Extension Package</b>
+            <div id="extReleaseMeta" style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">Latest verified enterprise build (.zip)</div>
+          </div>
+          <a href="/portal/api/extension/download" class="btn" download id="btnDownloadExt">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download Extension (.zip)
+          </a>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--muted); line-height: 1.45;">
+          <b>How to install:</b> Unzip the folder &rarr; Open Chrome at <code>chrome://extensions</code> &rarr; Enable "Developer Mode" (top right) &rarr; Click "Load unpacked" &rarr; Select the unzipped folder.
+        </div>
+      </div>
+
+      <!-- Live Support Chat Box -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2 style="display: flex; align-items: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Live Support Chat
+          </h2>
+          <span style="font-size: 0.75rem; color: var(--success); font-weight: 700;">Admin Online</span>
+        </div>
+        <div class="portal-chat-box" id="portalChatBox">
+          <div style="margin: auto; color: var(--muted); font-size: 0.85rem; text-align: center;">Loading chat history...</div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="portalChatInput" class="input" placeholder="Type your message to support..." style="flex: 1;">
+          <button class="btn" id="btnSendPortalChat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send
+          </button>
+        </div>
       </div>
     </div>
 
@@ -269,7 +339,7 @@
       <div class="panel-head">
         <div>
           <h2>Authorized Connected Devices</h2>
-          <p class="text-sm text-muted" style="margin-top: 4px;">Computers currently bound to your license. If you reach your device limit, remove an old PC to activate a new one.</p>
+          <p class="text-sm text-muted" style="margin-top: 4px;">Computers currently bound to your license. If you reach your device limit, disconnect an old PC to activate a new one.</p>
         </div>
       </div>
       <div id="devicesContainer">
@@ -279,7 +349,7 @@
       </div>
     </div>
 
-    <!-- Security & Support Grid -->
+    <!-- Account Password & Bug Reporting -->
     <div class="grid2">
       <!-- Change Password -->
       <div class="panel">
@@ -301,7 +371,7 @@
         <div id="passMsg" style="margin-top: 12px; font-size: 0.85rem; font-weight: 600;"></div>
       </div>
 
-      <!-- Report an Issue -->
+      <!-- Report Bug to Admin -->
       <div class="panel">
         <div class="panel-head">
           <h2>Report Issue / Bug to Admin</h2>
@@ -316,7 +386,7 @@
         </div>
         <button class="btn btn-outline" id="btnSubmitBug">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Send Report
+          Send Bug Report
         </button>
         <div id="bugMsg" style="margin-top: 12px; font-size: 0.85rem; font-weight: 600;"></div>
       </div>
@@ -325,8 +395,28 @@
 
   <script>
     let token = localStorage.getItem('lh_portal_token') || '';
+    let fullLicenseKey = '';
     const $ = (id) => document.getElementById(id);
     const headers = () => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` });
+
+    // Load Public Settings (WhatsApp Number)
+    async function loadPublicSettings() {
+      try {
+        const res = await fetch('/portal/api/settings/public');
+        const data = await res.json();
+        if (data.ok && data.whatsapp) {
+          const waUrl = `https://wa.me/${data.whatsapp.replace(/[^0-9]/g, '')}?text=Hi,%20I%20want%20to%20get%20a%20Lead%20Hunter%20License%20Key.`;
+          $('loginWhatsappBtn').href = waUrl;
+        }
+        if (data.release) {
+          $('extReleaseVersion').textContent = `Version ${data.release.version}`;
+          $('extReleaseMeta').textContent = `${data.release.filename} (${(data.release.size / (1024*1024)).toFixed(2)} MB)`;
+        }
+      } catch (e) {
+        console.warn('loadPublicSettings error:', e);
+      }
+    }
+    loadPublicSettings();
 
     function checkAuth() {
       if (token) {
@@ -334,6 +424,7 @@
         $('portalHeader').style.display = 'flex';
         $('portalMain').style.display = 'block';
         loadAccount();
+        loadSupportChat();
       } else {
         $('loginOverlay').style.display = 'flex';
         $('portalHeader').style.display = 'none';
@@ -380,11 +471,13 @@
       checkAuth();
     });
 
+    // Copy full license key
     $('btnCopyKey').addEventListener('click', () => {
-      navigator.clipboard.writeText($('licKeyDisplay').textContent.trim());
+      if (!fullLicenseKey) return;
+      navigator.clipboard.writeText(fullLicenseKey);
       const btn = $('btnCopyKey');
       const orig = btn.innerHTML;
-      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Key Copied!`;
       btn.style.background = '#00B074';
       btn.style.color = '#fff';
       setTimeout(() => {
@@ -407,20 +500,30 @@
         const data = await res.json();
         $('userNameDisplay').textContent = data.user.email;
         $('userInitial').textContent = (data.user.name || data.user.email || 'U')[0].toUpperCase();
-        
+
         if (data.license) {
-          $('licKeyDisplay').textContent = data.license.key;
+          fullLicenseKey = data.license.key;
+          $('licKeyDisplay').textContent = data.license.maskedKey || data.license.key;
           $('licStatusBadge').textContent = data.license.status;
           $('licStatusBadge').className = `badge badge-${data.license.status}`;
           $('licDaysLeft').textContent = data.license.daysLeft === 'Lifetime' ? 'Lifetime' : `${data.license.daysLeft}d`;
           $('licDevicesMax').textContent = `${data.devices.length} / ${data.license.deviceLimit}`;
-          
-          const remaining = data.license.maxRegenerations - data.license.regenerationsUsed;
-          $('regenRemaining').textContent = `${Math.max(0, remaining)} / ${data.license.maxRegenerations}`;
-          $('btnRegenerateKey').disabled = remaining <= 0;
-          if (remaining <= 0) {
-            $('btnRegenerateKey').style.opacity = '0.5';
-            $('btnRegenerateKey').style.cursor = 'not-allowed';
+          $('regenCount').textContent = data.license.regenerationsUsed || 0;
+
+          // 3-Day Regeneration Cooldown Check
+          const btnRegen = $('btnRegenerateKey');
+          const notice = $('regenCooldownNotice');
+          if (!data.license.canRegenerate) {
+            btnRegen.disabled = true;
+            btnRegen.style.opacity = '0.55';
+            btnRegen.style.cursor = 'not-allowed';
+            notice.textContent = `⏳ 3-day cooldown active: You can regenerate again in ${data.license.remainingHours} hour(s).`;
+          } else {
+            btnRegen.disabled = false;
+            btnRegen.style.opacity = '1';
+            btnRegen.style.cursor = 'pointer';
+            notice.textContent = '✅ You are eligible to generate a new key today.';
+            notice.style.color = 'var(--success)';
           }
         }
 
@@ -442,7 +545,7 @@
                 <div>
                   <div class="device-name">${escapeHtml(d.device_name || 'Personal Computer')}</div>
                   <div class="device-meta">
-                    ID: <code style="font-family:monospace; color:#64748B;">${escapeHtml(d.device_id.slice(0, 16))}...</code> &bull; Last seen: ${new Date(d.last_seen_at).toLocaleString()}
+                    ID: <code style="font-family:monospace; color:#64748B;">${escapeHtml(d.device_id.slice(0, 16))}...</code> &bull; IP: <code>${escapeHtml(d.ip || '-')}</code> &bull; Last seen: ${new Date(d.last_seen_at).toLocaleString()}
                   </div>
                 </div>
               </div>
@@ -456,11 +559,6 @@
       } catch (e) {
         console.error(e);
       }
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
 
     window.removeDevice = async (deviceId) => {
@@ -478,7 +576,7 @@
     };
 
     $('btnRegenerateKey').addEventListener('click', async () => {
-      if (!confirm('CRITICAL WARNING:\n\nThis will instantly revoke your current license key and disconnect ALL currently active computers.\n\nAre you sure you want to proceed?')) return;
+      if (!confirm('SECURITY WARNING:\n\nThis will permanently revoke your current license key and immediately disconnect ALL currently active computers.\n\nA new key will be issued, but you can only regenerate once every 3 days.\n\nDo you want to proceed?')) return;
       try {
         const res = await fetch('/portal/api/regenerate-key', { method: 'POST', headers: headers() });
         const data = await res.json();
@@ -492,6 +590,56 @@
         alert('Server communication error');
       }
     });
+
+    // Live Support Chat
+    async function loadSupportChat() {
+      try {
+        const res = await fetch('/portal/api/support/messages', { headers: headers() });
+        const data = await res.json();
+        const box = $('portalChatBox');
+        const msgs = data.messages || [];
+        if (msgs.length === 0) {
+          box.innerHTML = '<div style="margin: auto; color: var(--muted); font-size: 0.85rem; text-align: center;">Welcome to Lead Hunter Support! Send a message below and our admin team will reply directly.</div>';
+          return;
+        }
+
+        box.innerHTML = msgs.map((m) => `
+          <div class="portal-chat-bubble ${m.sender === 'user' ? 'user' : 'admin'}">
+            <div style="font-weight: 700; font-size: 0.74rem; margin-bottom: 2px; opacity: 0.85;">${m.sender === 'user' ? 'You' : 'Admin Support'}</div>
+            <div>${escapeHtml(m.message)}</div>
+            <div style="font-size: 0.7rem; margin-top: 3px; opacity: 0.7;">${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+        `).join('');
+        box.scrollTop = box.scrollHeight;
+      } catch (e) {
+        console.warn('loadSupportChat error:', e);
+      }
+    }
+
+    $('btnSendPortalChat').addEventListener('click', async () => {
+      const text = $('portalChatInput').value.trim();
+      if (!text) return;
+      $('portalChatInput').value = '';
+      try {
+        await fetch('/portal/api/support/messages', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({ message: text }),
+        });
+        loadSupportChat();
+      } catch (e) {
+        alert('Failed to send message');
+      }
+    });
+
+    $('portalChatInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') $('btnSendPortalChat').click();
+    });
+
+    // Auto-refresh chat every 8 seconds if authenticated
+    setInterval(() => {
+      if (token) loadSupportChat();
+    }, 8000);
 
     $('btnChangePass').addEventListener('click', async () => {
       const cur = $('curPass').value;
@@ -541,7 +689,7 @@
         const res = await fetch('/api/v1/report/bug', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, description: desc, licenseKey: $('licKeyDisplay').textContent.trim() }),
+          body: JSON.stringify({ title, description: desc, licenseKey: fullLicenseKey }),
         });
         const data = await res.json();
         $('bugMsg').textContent = data.message || 'Report submitted to developer queue!';
@@ -555,6 +703,11 @@
         $('btnSubmitBug').disabled = false;
       }
     });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
 
     checkAuth();
   </script>

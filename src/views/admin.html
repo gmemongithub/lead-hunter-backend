@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lead Hunter — Enterprise License Control Center</title>
+  <title>Lead Hunter — Enterprise Master Control Center</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -35,7 +35,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); -webkit-font-smoothing: antialiased; }
     body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; overflow-x: hidden; }
 
-    /* Login Modal Overlay - 100% Opaque, Solid Security Barrier */
+    /* Login Modal Overlay - 100% Opaque Solid Security Barrier */
     #loginOverlay { position: fixed; inset: 0; background: #0B0F19; display: flex; align-items: center; justify-content: center; z-index: 99999; }
     .login-card { background: #FFFFFF; border: 1px solid var(--border-darker); border-radius: 20px; padding: 36px; width: 100%; max-width: 420px; box-shadow: 0 24px 60px rgba(0,0,0,0.12); }
 
@@ -71,7 +71,7 @@
 
     .content-area { padding: 32px; max-width: 1400px; width: 100%; margin: 0 auto; flex: 1; }
 
-    /* Figma-Grade KPI Cards Strip */
+    /* KPI Cards Strip */
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 28px; }
     .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 22px; display: flex; justify-content: space-between; align-items: flex-start; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 12px rgba(0,0,0,0.03); }
     .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
@@ -83,7 +83,6 @@
     .icon-amber { background: var(--warning-soft); color: #D97706; }
     .icon-rose { background: var(--danger-soft); color: #E11D48; }
 
-    /* Trend Pill */
     .trend-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; margin-top: 6px; }
     .trend-pill.positive { background: var(--accent-soft); color: var(--accent); }
     .trend-pill.negative { background: var(--danger-soft); color: var(--danger); }
@@ -93,15 +92,26 @@
     .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
     .panel-head h2 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.2px; color: #1E2538; }
 
-    /* Figma Button Hierarchy */
+    /* Button Hierarchy */
     .btn { height: 42px; padding: 0 18px; border-radius: 10px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s ease; background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(91, 77, 251, 0.25); text-decoration: none; }
     .btn:hover { background: var(--accent-hover); box-shadow: 0 6px 18px rgba(91, 77, 251, 0.35); transform: translateY(-1px); }
     .btn:active { transform: translateY(0); }
     .btn-sm { height: 34px; padding: 0 14px; font-size: 13px; border-radius: 8px; }
     .btn-outline { background: #FFFFFF; border: 1px solid var(--border-darker); color: #475569; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
     .btn-outline:hover { background: #F8FAFC; border-color: #CBD5E1; color: #1E2538; transform: translateY(-1px); }
-    .btn-danger { background: var(--danger); box-shadow: 0 4px 12px rgba(255, 100, 124, 0.25); }
-    .btn-danger:hover { background: #E11D48; box-shadow: 0 6px 18px rgba(255, 100, 124, 0.35); }
+
+    /* High Contrast Revoke Button (Crystal Clear Red Alert) */
+    .btn-revoke { background: #FEE2E2 !important; color: #DC2626 !important; border: 1.5px solid #EF4444 !important; font-weight: 700 !important; }
+    .btn-revoke:hover { background: #DC2626 !important; color: #FFFFFF !important; border-color: #B91C1C !important; }
+
+    /* High Contrast Delete Button (Permanent Cleanup) */
+    .btn-delete { background: #FFF1F2 !important; color: #BE123C !important; border: 1.5px solid #FB7185 !important; font-weight: 700 !important; }
+    .btn-delete:hover { background: #BE123C !important; color: #FFFFFF !important; border-color: #9F1239 !important; }
+
+    /* High Contrast Suspend / Activate Button */
+    .btn-action-status { background: #F1F5F9; color: #334155; border: 1px solid #CBD5E1; font-weight: 600; }
+    .btn-action-status:hover { background: #E2E8F0; color: #0F172A; }
+
     .icon-btn { width: 34px; height: 34px; padding: 0; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-darker); background: #FFFFFF; color: #64748B; cursor: pointer; transition: 0.15s; }
     .icon-btn:hover { background: #F8FAFC; color: var(--accent); border-color: #CBD5E1; }
 
@@ -120,6 +130,10 @@
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #FAFBFC; }
 
+    /* Bulk Action Bar */
+    .bulk-toolbar { display: none; align-items: center; justify-content: space-between; background: #EEF0FF; border: 1.5px solid #C7D2FE; border-radius: 12px; padding: 12px 18px; margin-bottom: 16px; }
+    .bulk-toolbar.show { display: flex; }
+
     /* Pill Badges */
     .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; }
     .badge-ACTIVE { background: var(--success-soft); color: var(--success); border: 1px solid var(--success-border); }
@@ -127,12 +141,29 @@
     .badge-EXPIRED { background: var(--danger-soft); color: #E11D48; border: 1px solid var(--danger-border); }
     .badge-REVOKED, .badge-SUSPENDED { background: #F1F5F9; color: #64748B; border: 1px solid #CBD5E1; }
 
-    .code-key { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.88rem; background: #EEF0FF; padding: 5px 10px; border-radius: 8px; color: var(--accent); border: 1px solid #D6D8FF; font-weight: 700; user-select: all; }
+    .code-key { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.88rem; background: #EEF0FF; padding: 5px 10px; border-radius: 8px; color: var(--accent); border: 1px solid #D6D8FF; font-weight: 700; user-select: all; cursor: pointer; }
+    .code-key:hover { background: #E0E4FF; }
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
     /* Modals with Glassmorphism */
-    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-    .modal-box { background: #FFFFFF; border: 1px solid var(--border-darker); border-radius: 20px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 24px 60px rgba(0,0,0,0.15); }
+    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-box { background: #FFFFFF; border: 1px solid var(--border-darker); border-radius: 20px; padding: 32px; width: 100%; max-width: 540px; box-shadow: 0 24px 60px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
+    .modal-box-wide { max-width: 760px; }
+
+    /* Support Chat Split Layout */
+    .support-wrap { display: grid; grid-template-columns: 320px 1fr; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: #fff; min-height: 580px; }
+    .threads-list { border-right: 1px solid var(--border); background: #FAFBFD; overflow-y: auto; max-height: 600px; }
+    .thread-item { padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+    .thread-item:hover { background: #F1F4F9; }
+    .thread-item.active { background: #EEF0FF; border-left: 4px solid var(--accent); }
+    .chat-pane { display: flex; flex-direction: column; background: #FFFFFF; height: 600px; }
+    .chat-header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #F8FAFC; }
+    .chat-bubble { max-width: 75%; padding: 12px 16px; border-radius: 16px; font-size: 0.9rem; line-height: 1.45; word-break: break-word; }
+    .chat-bubble.user { align-self: flex-start; background: #FFFFFF; border: 1px solid var(--border-darker); color: #1E2538; border-bottom-left-radius: 4px; }
+    .chat-bubble.admin { align-self: flex-end; background: var(--accent); color: #FFFFFF; border-bottom-right-radius: 4px; }
+    .bubble-meta { font-size: 0.72rem; margin-top: 4px; opacity: 0.75; }
+    .chat-input-area { padding: 16px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: #FFFFFF; }
 
     @media (max-width: 900px) {
       aside { width: 70px; }
@@ -141,12 +172,13 @@
       .nav-btn { justify-content: center; padding: 12px; }
       .app-main { margin-left: 70px; }
       .grid2 { grid-template-columns: 1fr; }
+      .support-wrap { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Login Modal -->
+  <!-- Login Modal - 100% Solid Opaque Barrier -->
   <div id="loginOverlay">
     <div class="login-card">
       <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 24px;">
@@ -157,8 +189,8 @@
         </div>
       </div>
       <div class="form-group">
-        <label>Admin Username</label>
-        <input type="text" id="adminUser" class="input" placeholder="admin">
+        <label>Admin Email / Username</label>
+        <input type="text" id="adminUser" class="input" placeholder="gmemonhassan72@gmail.com">
       </div>
       <div class="form-group">
         <label>Master Password</label>
@@ -193,13 +225,25 @@
         <span>Customers &amp; Users</span>
       </button>
 
-      <div class="menu-label">Growth &amp; Sales</div>
+      <div class="menu-label">Communications</div>
+      <button class="nav-btn" data-tab="support">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Support Live Chat</span>
+      </button>
       <button class="nav-btn" data-tab="invites">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
         <span>Magic Invites</span>
       </button>
 
-      <div class="menu-label">Support &amp; Audit</div>
+      <div class="menu-label">System &amp; Releases</div>
+      <button class="nav-btn" data-tab="releases">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        <span>Extension Releases</span>
+      </button>
+      <button class="nav-btn" data-tab="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Global Settings</span>
+      </button>
       <button class="nav-btn" data-tab="bugs">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
         <span>Bug Inbox</span>
@@ -230,7 +274,7 @@
       <div class="header-left">
         <div class="header-title" id="pageTitle">License Management</div>
         <div class="status-live-pill">
-          <div class="status-dot"></div> Server Online
+          <div class="status-dot"></div> Server Online &bull; leads.devemon.tech
         </div>
       </div>
     </header>
@@ -242,7 +286,7 @@
           <div>
             <div class="kpi-title">Total Customers</div>
             <div class="kpi-num" id="statUsers">0</div>
-            <div class="trend-pill positive">+12% vs last mo</div>
+            <div class="trend-pill positive">Registered accounts</div>
           </div>
           <div class="kpi-icon-box icon-indigo">
             <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
@@ -253,7 +297,7 @@
           <div>
             <div class="kpi-title">Active Licenses</div>
             <div class="kpi-num" id="statActiveLic">0</div>
-            <div class="trend-pill positive">+18% growth</div>
+            <div class="trend-pill positive">Active seats</div>
           </div>
           <div class="kpi-icon-box icon-emerald">
             <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -262,7 +306,7 @@
 
         <div class="kpi-card">
           <div>
-            <div class="kpi-title">Active Connected PCs</div>
+            <div class="kpi-title">Connected PCs</div>
             <div class="kpi-num" id="statDevices">0</div>
             <div class="trend-pill positive">Online Seats</div>
           </div>
@@ -275,7 +319,7 @@
           <div>
             <div class="kpi-title">Open Bug Reports</div>
             <div class="kpi-num" id="statBugs" style="color: #D97706;">0</div>
-            <div class="trend-pill negative" id="statBugsPill">Needs Review</div>
+            <div class="trend-pill negative" id="statBugsPill">Review queue</div>
           </div>
           <div class="kpi-icon-box icon-rose">
             <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
@@ -360,13 +404,35 @@
                 <option value="UNCLAIMED">Unclaimed</option>
                 <option value="EXPIRED">Expired</option>
                 <option value="SUSPENDED">Suspended</option>
+                <option value="REVOKED">Revoked</option>
               </select>
             </div>
           </div>
+
+          <!-- Bulk Selection Toolbar -->
+          <div id="bulkToolbar" class="bulk-toolbar">
+            <div style="font-weight: 700; color: var(--accent); font-size: 0.92rem;">
+              <span id="bulkSelectedCount">0</span> licenses selected
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-sm btn-revoke" id="btnBulkRevoke">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                Bulk Revoke
+              </button>
+              <button class="btn btn-sm btn-delete" id="btnBulkDelete">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                Bulk Delete
+              </button>
+            </div>
+          </div>
+
           <div class="table-container">
             <table>
               <thead>
                 <tr>
+                  <th style="width: 40px; text-align: center;">
+                    <input type="checkbox" id="selectAllLic" style="cursor: pointer; width: 16px; height: 16px;">
+                  </th>
                   <th>License Key</th>
                   <th>Customer / Notes</th>
                   <th>Status</th>
@@ -396,7 +462,7 @@
                   <th>Linked Key</th>
                   <th>Devices</th>
                   <th>Created</th>
-                  <th>Credentials &amp; Security</th>
+                  <th>Actions &amp; Security</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody"></tbody>
@@ -405,13 +471,56 @@
         </div>
       </section>
 
-      <!-- TAB 3: MAGIC INVITES -->
+      <!-- TAB 3: LIVE SUPPORT CHAT -->
+      <section id="tab-support" class="tab-content" style="display: none;">
+        <div class="panel" style="padding: 16px;">
+          <div class="panel-head" style="margin-bottom: 12px;">
+            <h2>Live Customer Support Inbox</h2>
+            <button class="btn btn-sm btn-outline" id="btnRefreshSupport">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              Refresh Inbox
+            </button>
+          </div>
+          <div class="support-wrap">
+            <!-- Left Pane: Threads List -->
+            <div class="threads-list" id="supportThreadsList">
+              <div style="padding: 24px; text-align: center; color: var(--muted); font-size: 0.85rem;">
+                Loading support conversations...
+              </div>
+            </div>
+
+            <!-- Right Pane: Active Chat Conversation -->
+            <div class="chat-pane" id="chatPane">
+              <div class="chat-header">
+                <div>
+                  <h3 id="chatTargetTitle" style="font-size: 1.05rem; font-weight: 800; color: #1E2538;">Select a Conversation</h3>
+                  <div id="chatTargetMeta" style="font-size: 0.78rem; color: var(--muted);">Click a user from the inbox on the left to start chatting</div>
+                </div>
+              </div>
+              <div class="chat-messages" id="chatMessages">
+                <div style="margin: auto; color: var(--muted); font-size: 0.9rem; text-align: center;">
+                  No conversation selected.
+                </div>
+              </div>
+              <div class="chat-input-area" id="chatInputArea" style="display: none;">
+                <input type="text" id="adminReplyText" class="input" placeholder="Type reply message to customer..." style="flex: 1;">
+                <button class="btn" id="btnSendAdminReply">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  Send Reply
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: MAGIC INVITES -->
       <section id="tab-invites" class="tab-content" style="display: none;">
         <div class="grid2">
           <div class="panel">
             <div class="panel-head"><h2>Create Magic Onboarding Link</h2></div>
             <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 16px;">
-              Send a personalized invite link to a buyer. They click it to enter their name &amp; password and automatically claim their license key.
+              Send a personalized invite link to a buyer. One-time use: once signed up, subsequent visits show 404 Page Not Found.
             </p>
             <div class="form-group">
               <label>Plan Term</label>
@@ -441,7 +550,74 @@
         </div>
       </section>
 
-      <!-- TAB 4: BUG REPORTS -->
+      <!-- TAB 5: EXTENSION RELEASES -->
+      <section id="tab-releases" class="tab-content" style="display: none;">
+        <div class="grid2">
+          <!-- Current Release Card -->
+          <div class="panel">
+            <div class="panel-head"><h2>Active Extension Package</h2></div>
+            <div id="currentReleaseInfo">
+              <div style="padding: 24px; text-align: center; color: var(--muted);">Checking active release...</div>
+            </div>
+          </div>
+
+          <!-- Upload New Release -->
+          <div class="panel">
+            <div class="panel-head"><h2>Upload New Extension Build (.zip)</h2></div>
+            <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 16px;">
+              Upload your zipped Chrome extension package directly from your browser. Users can download this file from their customer portal.
+            </p>
+            <div class="form-group">
+              <label>Version Name</label>
+              <input type="text" id="releaseVersion" class="input" placeholder="e.g. v2.4.0">
+            </div>
+            <div class="form-group">
+              <label>Select Extension Zip File</label>
+              <input type="file" id="releaseFile" accept=".zip" class="input" style="padding-top: 8px;">
+            </div>
+            <button class="btn" id="btnUploadRelease">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              Upload Extension Release
+            </button>
+            <div id="uploadStatusMsg" style="margin-top: 14px; font-size: 0.88rem; font-weight: 600;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: GLOBAL SETTINGS -->
+      <section id="tab-settings" class="tab-content" style="display: none;">
+        <div class="grid2">
+          <div class="panel">
+            <div class="panel-head"><h2>Support &amp; WhatsApp Integration</h2></div>
+            <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 16px;">
+              Configures the direct WhatsApp redirect for "Get License Key" button across login screens and public portals.
+            </p>
+            <div class="form-group">
+              <label>WhatsApp Number (with country code, no + or spaces)</label>
+              <input type="text" id="settingWhatsapp" class="input" placeholder="e.g. 8801700000000">
+            </div>
+            <button class="btn" id="btnSaveWhatsapp">Save WhatsApp Number</button>
+            <div id="settingWhatsappMsg" style="margin-top: 12px; font-size: 0.85rem; font-weight: 600;"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h2>Master Admin Profile</h2></div>
+            <div class="form-group">
+              <label>Active Admin Email</label>
+              <input type="text" class="input" value="gmemonhassan72@gmail.com" readonly style="background: #F1F5F9; color: #475569;">
+            </div>
+            <div class="form-group">
+              <label>Master Admin Slug</label>
+              <input type="text" class="input" value="/master-control" readonly style="background: #F1F5F9; color: #475569;">
+            </div>
+            <p style="color: var(--muted); font-size: 0.8rem; margin-top: 8px;">
+              To change your superadmin credentials, update your secure environment configuration.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 7: BUG REPORTS -->
       <section id="tab-bugs" class="tab-content" style="display: none;">
         <div class="panel">
           <div class="panel-head"><h2>Extension Bug Reports</h2></div>
@@ -463,7 +639,7 @@
         </div>
       </section>
 
-      <!-- TAB 5: AUDIT LOGS -->
+      <!-- TAB 8: AUDIT LOGS -->
       <section id="tab-logs" class="tab-content" style="display: none;">
         <div class="panel">
           <div class="panel-head"><h2>Security &amp; Activation Audit Log</h2></div>
@@ -486,7 +662,24 @@
     </div>
   </div>
 
-  <!-- Master Password Verification Modal (Required to reveal customer password) -->
+  <!-- Customer & License Inspection Modal -->
+  <div id="detailsModal" class="modal" style="display: none;">
+    <div class="modal-box modal-box-wide">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+        <div>
+          <h3 id="detModalTitle" style="font-size: 1.25rem; font-weight: 800; color: #1E2538;">Customer Inspection</h3>
+          <p id="detModalSubtitle" style="color: var(--muted); font-size: 0.85rem; margin-top: 2px;">Deep device and security audit trail</p>
+        </div>
+        <button class="icon-btn" onclick="$('detailsModal').style.display='none'">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div id="detModalContent">Loading customer details...</div>
+    </div>
+  </div>
+
+  <!-- Master Password Verification Modal -->
   <div id="revealModal" class="modal" style="display: none;">
     <div class="modal-box">
       <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; color: #1E2538;">Authorize Sensitive Decryption</h3>
@@ -512,6 +705,8 @@
   <script>
     let token = localStorage.getItem('lh_admin_token') || '';
     let currentTargetUserId = null;
+    let selectedLicenseIds = new Set();
+    let currentSupportThread = null;
     const $ = (id) => document.getElementById(id);
     const headers = () => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` });
 
@@ -531,18 +726,22 @@
     $('btnLogin').addEventListener('click', async () => {
       const username = $('adminUser').value.trim();
       const password = $('adminPass').value;
-      const res = await fetch('/admin/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        token = data.token;
-        localStorage.setItem('lh_admin_token', token);
-        checkAuth();
-      } else {
-        $('loginErr').textContent = data.message || 'Invalid credentials';
+      try {
+        const res = await fetch('/admin/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          token = data.token;
+          localStorage.setItem('lh_admin_token', token);
+          checkAuth();
+        } else {
+          $('loginErr').textContent = data.message || 'Invalid credentials';
+        }
+      } catch (e) {
+        $('loginErr').textContent = 'Network communication error';
       }
     });
 
@@ -563,7 +762,10 @@
         $('pageTitle').textContent = btn.querySelector('span').textContent;
         if (tab === 'licenses') loadLicenses();
         if (tab === 'users') loadUsers();
+        if (tab === 'support') loadSupportThreads();
         if (tab === 'invites') loadInvites();
+        if (tab === 'releases') loadReleaseInfo();
+        if (tab === 'settings') loadSettings();
         if (tab === 'bugs') loadBugs();
         if (tab === 'logs') loadLogs();
       });
@@ -587,13 +789,6 @@
           headers: headers(),
           body: JSON.stringify({ term, customDays, deviceLimit, customerName }),
         });
-        if (res.status === 401) {
-          localStorage.removeItem('lh_admin_token');
-          token = '';
-          checkAuth();
-          alert('Session expired. Please sign in again.');
-          return;
-        }
         const data = await res.json();
         if (data.ok) {
           $('singleResult').innerHTML = `
@@ -629,13 +824,6 @@
           headers: headers(),
           body: JSON.stringify({ count, term, label }),
         });
-        if (res.status === 401) {
-          localStorage.removeItem('lh_admin_token');
-          token = '';
-          checkAuth();
-          alert('Session expired. Please sign in again.');
-          return;
-        }
         const data = await res.json();
         if (data.ok) {
           $('bulkResult').innerHTML = `
@@ -695,6 +883,8 @@
         if (!res.ok) return;
         const { licenses } = await res.json();
         window.__licenses = licenses || [];
+        selectedLicenseIds.clear();
+        updateBulkToolbar();
         renderLicenses(window.__licenses);
       } catch (e) {
         console.warn('loadLicenses error:', e);
@@ -704,33 +894,152 @@
     function renderLicenses(list) {
       const tbody = $('licTableBody');
       if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px;">No licenses found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px;">No licenses found</td></tr>';
         return;
       }
       tbody.innerHTML = list.map((lic) => `
         <tr>
-          <td><span class="code-key">${lic.license_key}</span></td>
+          <td style="text-align: center;">
+            <input type="checkbox" class="lic-cb" data-id="${lic.id}" ${selectedLicenseIds.has(lic.id) ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px;">
+          </td>
           <td>
-            <b>${lic.customer_name || 'Unassigned'}</b>
-            ${lic.admin_notes ? `<div style="font-size:0.75rem;color:var(--muted);">${lic.admin_notes}</div>` : ''}
+            <span class="code-key" onclick="openInspection('${lic.id}')" title="Click to view full inspection details">${lic.license_key}</span>
+          </td>
+          <td>
+            <b style="cursor: pointer; color: #1E2538;" onclick="openInspection('${lic.id}')">${escapeHtml(lic.customer_name || 'Unassigned')}</b>
+            ${lic.user_email ? `<div style="font-size:0.75rem;color:var(--muted);">${escapeHtml(lic.user_email)}</div>` : ''}
+            ${lic.admin_notes ? `<div style="font-size:0.72rem;color:#64748B;">${escapeHtml(lic.admin_notes)}</div>` : ''}
           </td>
           <td><span class="badge badge-${lic.status}">${lic.status}</span></td>
           <td>${lic.term === 'custom' ? `${lic.days} Days` : lic.term}</td>
           <td>${lic.active_devices || 0} / ${lic.device_limit} PCs</td>
-          <td>
-            <button class="btn btn-sm btn-outline" onclick="changeStatus('${lic.id}', '${lic.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE'}')">
-              ${lic.status === 'ACTIVE' ? 'Suspend' : 'Activate'}
-            </button>
-            <button class="btn btn-sm btn-danger btn-outline" style="color:var(--danger);" onclick="changeStatus('${lic.id}', 'REVOKED')">
-              Revoke
-            </button>
+          <td style="white-space: nowrap;">
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button class="btn btn-sm btn-action-status" onclick="changeStatus('${lic.id}', '${lic.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE'}')">
+                ${lic.status === 'ACTIVE' ? 'Suspend' : 'Activate'}
+              </button>
+              <button class="btn btn-sm btn-revoke" onclick="changeStatus('${lic.id}', 'REVOKED')">
+                Revoke
+              </button>
+              <button class="btn btn-sm btn-delete" onclick="deleteSingleLicense('${lic.id}', '${lic.license_key}')">
+                Delete
+              </button>
+            </div>
           </td>
         </tr>
       `).join('');
+
+      // Wire checkboxes
+      document.querySelectorAll('.lic-cb').forEach((cb) => {
+        cb.addEventListener('change', (e) => {
+          const id = e.target.dataset.id;
+          if (e.target.checked) selectedLicenseIds.add(id);
+          else selectedLicenseIds.delete(id);
+          updateBulkToolbar();
+        });
+      });
     }
 
+    $('selectAllLic').addEventListener('change', (e) => {
+      const checked = e.target.checked;
+      const filtered = getCurrentFilteredLicenses();
+      filtered.forEach((lic) => {
+        if (checked) selectedLicenseIds.add(lic.id);
+        else selectedLicenseIds.delete(lic.id);
+      });
+      renderLicenses(filtered);
+      updateBulkToolbar();
+    });
+
+    function updateBulkToolbar() {
+      const count = selectedLicenseIds.size;
+      const bar = $('bulkToolbar');
+      $('bulkSelectedCount').textContent = count;
+      if (count > 0) bar.classList.add('show');
+      else bar.classList.remove('show');
+    }
+
+    function getCurrentFilteredLicenses() {
+      const q = $('licSearch').value.toLowerCase();
+      const status = $('licFilter').value;
+      return (window.__licenses || []).filter((l) => {
+        const matchesQ = l.license_key.toLowerCase().includes(q) || (l.customer_name && l.customer_name.toLowerCase().includes(q)) || (l.user_email && l.user_email.toLowerCase().includes(q));
+        const matchesStatus = status === 'all' || l.status === status;
+        return matchesQ && matchesStatus;
+      });
+    }
+
+    // Bulk Delete
+    $('btnBulkDelete').addEventListener('click', async () => {
+      const ids = Array.from(selectedLicenseIds);
+      if (!ids.length) return;
+      if (!confirm(`Permanently delete ${ids.length} selected license(s)? This will clean your dashboard and remove all linked devices.`)) return;
+      try {
+        const res = await fetch('/admin/api/licenses/bulk-delete', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({ ids }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          selectedLicenseIds.clear();
+          loadLicenses();
+          loadStats();
+        } else {
+          alert(data.message || 'Failed to delete licenses');
+        }
+      } catch (err) {
+        alert('Server communication error');
+      }
+    });
+
+    // Bulk Revoke
+    $('btnBulkRevoke').addEventListener('click', async () => {
+      const ids = Array.from(selectedLicenseIds);
+      if (!ids.length) return;
+      if (!confirm(`Revoke ${ids.length} selected license(s)? All connected computers will be disconnected immediately.`)) return;
+      try {
+        const res = await fetch('/admin/api/licenses/bulk-revoke', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({ ids }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          selectedLicenseIds.clear();
+          loadLicenses();
+          loadStats();
+        } else {
+          alert(data.message || 'Failed to revoke licenses');
+        }
+      } catch (err) {
+        alert('Server communication error');
+      }
+    });
+
+    // Single Delete
+    window.deleteSingleLicense = async (id, key) => {
+      if (!confirm(`Permanently delete license "${key}"?\n\nThis will remove the license from your dashboard, clear devices, and delete magic links.`)) return;
+      try {
+        const res = await fetch(`/admin/api/licenses/${id}`, {
+          method: 'DELETE',
+          headers: headers(),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          selectedLicenseIds.delete(id);
+          loadLicenses();
+          loadStats();
+        } else {
+          alert(data.message || 'Error deleting license');
+        }
+      } catch (err) {
+        alert('Network communication error');
+      }
+    };
+
     window.changeStatus = async (id, status) => {
-      if (!confirm(`Are you sure you want to change status to ${status}?`)) return;
+      if (!confirm(`Are you sure you want to change license status to ${status}?`)) return;
       await fetch(`/admin/api/licenses/${id}/status`, {
         method: 'POST',
         headers: headers(),
@@ -740,19 +1049,81 @@
       loadStats();
     };
 
-    $('licSearch').addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase();
-      const filtered = (window.__licenses || []).filter(
-        (l) => l.license_key.toLowerCase().includes(q) || (l.customer_name && l.customer_name.toLowerCase().includes(q))
-      );
-      renderLicenses(filtered);
-    });
+    // Customer Inspection Modal
+    window.openInspection = async (id) => {
+      $('detailsModal').style.display = 'flex';
+      $('detModalContent').innerHTML = '<div style="padding: 24px; text-align: center; color: var(--muted);">Loading customer and device history...</div>';
+      try {
+        const res = await fetch(`/admin/api/licenses/${id}/details`, { headers: headers() });
+        const data = await res.json();
+        if (!data.ok) {
+          $('detModalContent').innerHTML = `<div style="color:var(--danger);">${data.message}</div>`;
+          return;
+        }
 
-    $('licFilter').addEventListener('change', (e) => {
-      const val = e.target.value;
-      if (val === 'all') return renderLicenses(window.__licenses || []);
-      renderLicenses((window.__licenses || []).filter((l) => l.status === val));
-    });
+        const lic = data.license;
+        const devices = data.devices || [];
+        const logs = data.logs || [];
+
+        $('detModalTitle').textContent = `Customer: ${lic.customer_name || lic.user_email || 'Unassigned'}`;
+        $('detModalSubtitle').textContent = `License Key: ${lic.license_key} (${lic.status})`;
+
+        $('detModalContent').innerHTML = `
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+            <div><small style="color:var(--muted);font-weight:700;">PLAN TERM</small><div style="font-weight:800;margin-top:2px;">${lic.term}</div></div>
+            <div><small style="color:var(--muted);font-weight:700;">DEVICE LIMIT</small><div style="font-weight:800;margin-top:2px;">${devices.length} / ${lic.device_limit} PCs</div></div>
+            <div><small style="color:var(--muted);font-weight:700;">LINKED EMAIL</small><div style="font-weight:800;margin-top:2px;">${escapeHtml(lic.user_email || 'None')}</div></div>
+          </div>
+
+          <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 10px; color: #1E2538;">Authorized Connected Devices (${devices.length})</h4>
+          ${devices.length === 0 ? '<p style="color:var(--muted);font-size:0.85rem;margin-bottom:20px;">No computers connected yet.</p>' : `
+            <div class="table-container" style="margin-bottom: 24px;">
+              <table>
+                <thead>
+                  <tr><th>Device Name</th><th>Device ID</th><th>IP Address</th><th>Last Seen</th></tr>
+                </thead>
+                <tbody>
+                  ${devices.map((d) => `
+                    <tr>
+                      <td><b>${escapeHtml(d.device_name || 'Personal Computer')}</b></td>
+                      <td><code style="font-family:monospace;font-size:0.8rem;">${escapeHtml(d.device_id.slice(0, 16))}...</code></td>
+                      <td><code>${escapeHtml(d.ip || '-')}</code></td>
+                      <td>${new Date(d.last_seen_at).toLocaleString()}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          `}
+
+          <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 10px; color: #1E2538;">Recent Security &amp; Activity Logs</h4>
+          ${logs.length === 0 ? '<p style="color:var(--muted);font-size:0.85rem;">No security activity logged yet.</p>' : `
+            <div class="table-container" style="max-height: 240px; overflow-y: auto;">
+              <table>
+                <thead>
+                  <tr><th>Timestamp</th><th>Event</th><th>IP</th><th>Details</th></tr>
+                </thead>
+                <tbody>
+                  ${logs.map((l) => `
+                    <tr>
+                      <td>${new Date(l.created_at).toLocaleString()}</td>
+                      <td><b>${escapeHtml(l.event)}</b></td>
+                      <td><code>${escapeHtml(l.ip)}</code></td>
+                      <td style="font-size:0.8rem;color:var(--muted);">${escapeHtml(l.details || '')}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          `}
+        `;
+      } catch (e) {
+        $('detModalContent').innerHTML = '<div style="color:var(--danger);">Error loading details</div>';
+      }
+    };
+
+    $('licSearch').addEventListener('input', () => renderLicenses(getCurrentFilteredLicenses()));
+    $('licFilter').addEventListener('change', () => renderLicenses(getCurrentFilteredLicenses()));
 
     async function loadUsers() {
       const res = await fetch('/admin/api/users', { headers: headers() });
@@ -761,17 +1132,14 @@
       $('usersTableBody').innerHTML = users.map((u) => `
         <tr>
           <td>
-            <b>${u.name || 'Customer'}</b>
-            <div style="font-size:0.8rem;color:var(--muted);">${u.email}</div>
+            <b>${escapeHtml(u.name || 'Customer')}</b>
+            <div style="font-size:0.8rem;color:var(--muted);">${escapeHtml(u.email)}</div>
           </td>
           <td><span class="code-key">${u.license_key || 'None'}</span></td>
           <td>${u.active_devices || 0} Connected</td>
           <td>${new Date(u.created_at).toLocaleDateString()}</td>
           <td>
-            <button class="btn btn-sm btn-outline" onclick="openReveal('${u.id}')">
-              <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              View Pass
-            </button>
+            <button class="btn btn-sm btn-outline" onclick="openReveal('${u.id}')">View Pass</button>
             <button class="btn btn-sm btn-outline" onclick="promptSetPass('${u.id}')">Set Pass</button>
             <button class="btn btn-sm btn-outline" onclick="generateResetLink('${u.id}')">Magic Reset</button>
           </td>
@@ -779,6 +1147,331 @@
       `).join('');
     }
 
+    // Support Chat Manager
+    async function loadSupportThreads() {
+      try {
+        const res = await fetch('/admin/api/support/threads', { headers: headers() });
+        const data = await res.json();
+        const threads = data.threads || [];
+        const container = $('supportThreadsList');
+        if (threads.length === 0) {
+          container.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--muted); font-size: 0.85rem;">No support messages yet.</div>';
+          return;
+        }
+
+        container.innerHTML = threads.map((th, idx) => `
+          <div class="thread-item ${currentSupportThread?.user_id === th.user_id ? 'active' : ''}" onclick="selectSupportThread('${th.user_id}', '${escapeHtml(th.name || th.email)}', '${th.license_key || ''}')">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <b style="font-size: 0.9rem; color: #1E2538;">${escapeHtml(th.name || th.email)}</b>
+              ${th.unread_count > 0 ? `<span class="badge badge-ACTIVE" style="padding: 2px 8px; font-size: 0.68rem;">${th.unread_count} NEW</span>` : ''}
+            </div>
+            <div style="font-size: 0.78rem; color: var(--muted);">${escapeHtml(th.email)}</div>
+            <div style="font-size: 0.72rem; color: #94A3B8; margin-top: 4px;">Key: <code>${th.license_key || 'N/A'}</code> &bull; ${new Date(th.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+        `).join('');
+
+        if (!currentSupportThread && threads.length > 0) {
+          selectSupportThread(threads[0].user_id, threads[0].name || threads[0].email, threads[0].license_key || '');
+        }
+      } catch (e) {
+        console.warn('loadSupportThreads error:', e);
+      }
+    }
+
+    window.selectSupportThread = async (userId, name, licenseKey) => {
+      currentSupportThread = { user_id: userId, name, license_key: licenseKey };
+      $('chatTargetTitle').textContent = name;
+      $('chatTargetMeta').textContent = `License Key: ${licenseKey || 'N/A'} (Customer ID: ${userId})`;
+      $('chatInputArea').style.display = 'flex';
+      loadSupportMessages(userId);
+    };
+
+    async function loadSupportMessages(userId) {
+      try {
+        const res = await fetch(`/admin/api/support/messages?userId=${userId}`, { headers: headers() });
+        const data = await res.json();
+        const messages = data.messages || [];
+        const box = $('chatMessages');
+        if (messages.length === 0) {
+          box.innerHTML = '<div style="margin: auto; color: var(--muted); font-size: 0.88rem;">No messages in this conversation yet. Send a greeting below!</div>';
+          return;
+        }
+
+        box.innerHTML = messages.map((m) => `
+          <div class="chat-bubble ${m.sender === 'admin' ? 'admin' : 'user'}">
+            <div style="font-weight: 700; font-size: 0.76rem; margin-bottom: 3px; opacity: 0.85;">${m.sender === 'admin' ? 'Superadmin (You)' : 'Customer'}</div>
+            <div>${escapeHtml(m.message)}</div>
+            <div class="bubble-meta">${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+        `).join('');
+        box.scrollTop = box.scrollHeight;
+      } catch (e) {
+        console.warn('loadSupportMessages error:', e);
+      }
+    }
+
+    $('btnSendAdminReply').addEventListener('click', async () => {
+      if (!currentSupportThread) return;
+      const text = $('adminReplyText').value.trim();
+      if (!text) return;
+      $('adminReplyText').value = '';
+      try {
+        await fetch('/admin/api/support/reply', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({ userId: currentSupportThread.user_id, licenseKey: currentSupportThread.license_key, message: text }),
+        });
+        loadSupportMessages(currentSupportThread.user_id);
+      } catch (e) {
+        alert('Failed to send reply');
+      }
+    });
+
+    $('adminReplyText').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') $('btnSendAdminReply').click();
+    });
+
+    $('btnRefreshSupport').addEventListener('click', () => loadSupportThreads());
+
+    // Extension Releases Manager
+    async function loadReleaseInfo() {
+      try {
+        const res = await fetch('/admin/api/extension/info', { headers: headers() });
+        const data = await res.json();
+        const container = $('currentReleaseInfo');
+        if (!data.exists || !data.release) {
+          container.innerHTML = `
+            <div style="padding: 28px; text-align: center; color: var(--muted);">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 8px; opacity: 0.6;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <div style="font-weight: 700; color: #1E2538; font-size: 0.95rem;">No active package uploaded yet</div>
+              <div style="font-size: 0.82rem; margin-top: 4px;">Upload your extension .zip using the form on the right.</div>
+            </div>`;
+          return;
+        }
+
+        const rel = data.release;
+        const sizeMb = (rel.size / (1024 * 1024)).toFixed(2);
+        container.innerHTML = `
+          <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 14px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span class="badge badge-ACTIVE">Live Release</span>
+              <span style="font-size: 0.8rem; color: var(--muted);">${new Date(rel.uploaded_at).toLocaleString()}</span>
+            </div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: #1E2538; margin-bottom: 4px;">Version ${escapeHtml(rel.version)}</div>
+            <div style="font-size: 0.85rem; color: var(--muted); margin-bottom: 16px;">
+              File: <b>${escapeHtml(rel.filename)}</b> &bull; Size: ${sizeMb} MB
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <a href="/portal/api/extension/download" class="btn btn-sm btn-outline" download>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download Test .zip
+              </a>
+              <button class="btn btn-sm btn-delete" onclick="deleteExtensionRelease()">Delete Release</button>
+            </div>
+          </div>
+        `;
+      } catch (e) {
+        console.warn('loadReleaseInfo error:', e);
+      }
+    }
+
+    $('btnUploadRelease').addEventListener('click', async () => {
+      const fileInput = $('releaseFile');
+      const version = $('releaseVersion').value.trim() || 'v2.0.0';
+      const file = fileInput.files[0];
+      if (!file) {
+        $('uploadStatusMsg').textContent = 'Please choose a .zip file to upload.';
+        $('uploadStatusMsg').style.color = 'var(--danger)';
+        return;
+      }
+
+      $('btnUploadRelease').disabled = true;
+      $('btnUploadRelease').textContent = 'Uploading .zip package...';
+      $('uploadStatusMsg').textContent = 'Uploading binary stream...';
+      $('uploadStatusMsg').style.color = 'var(--accent)';
+
+      try {
+        const arrayBuf = await file.arrayBuffer();
+        const res = await fetch('/admin/api/extension/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/octet-stream',
+            'x-filename': file.name,
+            'x-version': version,
+          },
+          body: arrayBuf,
+        });
+        const data = await res.json();
+        if (data.ok) {
+          $('uploadStatusMsg').textContent = `Success! Release ${version} uploaded (${(file.size / (1024 * 1024)).toFixed(2)} MB). Customers can now download it.`;
+          $('uploadStatusMsg').style.color = 'var(--success)';
+          fileInput.value = '';
+          loadReleaseInfo();
+        } else {
+          $('uploadStatusMsg').textContent = data.message || 'Upload failed';
+          $('uploadStatusMsg').style.color = 'var(--danger)';
+        }
+      } catch (err) {
+        $('uploadStatusMsg').textContent = 'Network error during upload';
+        $('uploadStatusMsg').style.color = 'var(--danger)';
+      } finally {
+        $('btnUploadRelease').disabled = false;
+        $('btnUploadRelease').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> Upload Extension Release`;
+      }
+    });
+
+    window.deleteExtensionRelease = async () => {
+      if (!confirm('Remove the active extension download? Customers will not be able to download the zip until a new one is uploaded.')) return;
+      try {
+        await fetch('/admin/api/extension', { method: 'DELETE', headers: headers() });
+        loadReleaseInfo();
+      } catch (e) {
+        alert('Failed to delete release');
+      }
+    };
+
+    // Global Settings
+    async function loadSettings() {
+      try {
+        const res = await fetch('/admin/api/settings/whatsapp', { headers: headers() });
+        const data = await res.json();
+        if (data.ok) $('settingWhatsapp').value = data.whatsapp || '';
+      } catch (e) {
+        console.warn('loadSettings error:', e);
+      }
+    }
+
+    $('btnSaveWhatsapp').addEventListener('click', async () => {
+      const whatsapp = $('settingWhatsapp').value.trim();
+      try {
+        const res = await fetch('/admin/api/settings/whatsapp', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({ whatsapp }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          $('settingWhatsappMsg').textContent = 'WhatsApp number updated successfully!';
+          $('settingWhatsappMsg').style.color = 'var(--success)';
+        }
+      } catch (e) {
+        $('settingWhatsappMsg').textContent = 'Failed to save setting';
+        $('settingWhatsappMsg').style.color = 'var(--danger)';
+      }
+    });
+
+    // Magic Invites
+    $('btnGenInvite').addEventListener('click', async () => {
+      const term = $('inviteTerm').value;
+      const deviceLimit = $('inviteDevices').value;
+
+      $('btnGenInvite').disabled = true;
+      $('btnGenInvite').textContent = 'Generating...';
+      try {
+        const res = await fetch('/admin/api/magic-invite', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({ term, deviceLimit }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          const magicUrl = location.origin + '/portal/setup?token=' + data.token;
+          $('inviteResult').innerHTML = `
+            <div style="background:#EEF0FF; border:1px solid #D6D8FF; padding:16px; border-radius:14px; margin-top:14px;">
+              <div style="font-size:0.75rem; color:#5B4DFB; font-weight:800; text-transform:uppercase;">Magic Onboarding URL:</div>
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <input type="text" class="input" value="${magicUrl}" readonly onclick="this.select()" style="background:#fff; flex:1;">
+                <button class="btn btn-sm" onclick="navigator.clipboard.writeText('${magicUrl}'); alert('Invite link copied to clipboard!');">Copy Link</button>
+              </div>
+              <div style="font-size:0.8rem; color:#64748B; margin-top:8px;">Key: <code>${data.licenseKey || ''}</code> (One-time claim only)</div>
+            </div>`;
+          loadInvites();
+        } else {
+          $('inviteResult').innerHTML = `<div style="color:var(--danger); font-size:0.85rem; margin-top:10px; font-weight:600;">${data.message || 'Error generating invite'}</div>`;
+        }
+      } catch (err) {
+        $('inviteResult').innerHTML = '<div style="color:var(--danger); font-size:0.85rem; margin-top:10px;">Network connection error.</div>';
+      } finally {
+        $('btnGenInvite').disabled = false;
+        $('btnGenInvite').innerHTML = `<svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Generate Magic Link`;
+      }
+    });
+
+    async function loadInvites() {
+      try {
+        const res = await fetch('/admin/api/magic-invites/active', { headers: headers() });
+        const data = await res.json();
+        const invites = data.invites || [];
+        const container = $('invitesListContainer');
+        if (invites.length === 0) {
+          container.innerHTML = '<p style="color:var(--muted);font-size:0.85rem;">No active invite links.</p>';
+          return;
+        }
+        container.innerHTML = invites.map((inv) => {
+          const invUrl = location.origin + '/portal/setup?token=' + inv.token;
+          return `
+            <div style="background:#F8FAFC; border:1px solid var(--border); padding:14px; border-radius:12px; margin-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b>Plan: ${inv.term} &bull; ${inv.device_limit} PCs</b>
+                <span class="badge badge-ACTIVE">Valid</span>
+              </div>
+              <div style="font-size:0.8rem; color:var(--muted); margin:6px 0;">Key: <code>${inv.license_key || 'Pending'}</code></div>
+              <button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText('${invUrl}'); alert('Copied!')">Copy Link</button>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.warn('loadInvites error:', e);
+      }
+    }
+
+    async function loadBugs() {
+      const res = await fetch('/admin/api/bugs', { headers: headers() });
+      if (!res.ok) return;
+      const { bugs } = await res.json();
+      $('bugsTableBody').innerHTML = bugs.map((b) => `
+        <tr>
+          <td>${new Date(b.created_at).toLocaleString()}</td>
+          <td><span class="code-key">${b.license_key || 'unknown'}</span></td>
+          <td><b>${escapeHtml(b.title)}</b></td>
+          <td style="font-size:0.85rem;max-width:320px;">${escapeHtml(b.description)}</td>
+          <td><span class="badge badge-${b.status === 'RESOLVED' ? 'ACTIVE' : 'UNCLAIMED'}">${b.status}</span></td>
+          <td>
+            <button class="btn btn-sm btn-outline" onclick="toggleBugStatus('${b.id}', '${b.status === 'OPEN' ? 'RESOLVED' : 'OPEN'}')">
+              ${b.status === 'OPEN' ? 'Mark Resolved' : 'Reopen'}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.toggleBugStatus = async (id, status) => {
+      await fetch(`/admin/api/bugs/${id}/status`, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify({ status }),
+      });
+      loadBugs();
+      loadStats();
+    };
+
+    async function loadLogs() {
+      const res = await fetch('/admin/api/audit-logs', { headers: headers() });
+      if (!res.ok) return;
+      const { logs } = await res.json();
+      $('logsTableBody').innerHTML = logs.map((l) => `
+        <tr>
+          <td>${new Date(l.created_at).toLocaleString()}</td>
+          <td><b>${escapeHtml(l.event)}</b></td>
+          <td><code>${escapeHtml(l.ip)}</code></td>
+          <td><span class="code-key">${escapeHtml(l.license_key || '-')}</span></td>
+          <td style="font-size:0.8rem; color:var(--muted);">${escapeHtml(l.details || '')}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Pass reveal helper
     window.openReveal = (userId) => {
       currentTargetUserId = userId;
       $('modalMasterPass').value = '';
@@ -828,129 +1521,15 @@
       const data = await res.json();
       if (data.ok) {
         navigator.clipboard.writeText(data.resetUrl);
-        alert(`Magic Password Reset Link generated and copied to clipboard!\n\n${data.resetUrl}\n\nSend this link to the customer to let them reset their password.`);
+        alert(`Magic Password Reset Link copied to clipboard!\n\n${data.resetUrl}`);
       } else {
         alert(data.message || 'Failed to generate reset link');
       }
     };
 
-    $('btnGenInvite').addEventListener('click', async () => {
-      const term = $('inviteTerm').value;
-      const deviceLimit = $('inviteDevices').value;
-
-      $('btnGenInvite').disabled = true;
-      $('btnGenInvite').textContent = 'Generating...';
-      try {
-        const res = await fetch('/admin/api/magic-invite', {
-          method: 'POST',
-          headers: headers(),
-          body: JSON.stringify({ term, deviceLimit }),
-        });
-        if (res.status === 401) {
-          localStorage.removeItem('lh_admin_token');
-          token = '';
-          checkAuth();
-          alert('Session expired. Please sign in again.');
-          return;
-        }
-        const data = await res.json();
-        if (data.ok) {
-          const magicUrl = location.origin + '/portal/setup?token=' + data.token;
-          $('inviteResult').innerHTML = `
-            <div style="background:#EEF0FF; border:1px solid #D6D8FF; padding:16px; border-radius:14px; margin-top:14px;">
-              <div style="font-size:0.75rem; color:#5B4DFB; font-weight:800; text-transform:uppercase;">Magic Onboarding URL:</div>
-              <div style="display:flex; gap:8px; margin-top:8px;">
-                <input type="text" class="input" value="${magicUrl}" readonly onclick="this.select()" style="background:#fff; flex:1;">
-                <button class="btn btn-sm" onclick="navigator.clipboard.writeText('${magicUrl}'); alert('Invite link copied to clipboard!');">Copy Link</button>
-              </div>
-              <div style="font-size:0.8rem; color:#64748B; margin-top:8px;">Key: <code>${data.licenseKey || ''}</code> (Expires in 7 days)</div>
-            </div>`;
-          loadInvites();
-        } else {
-          $('inviteResult').innerHTML = `<div style="color:var(--danger); font-size:0.85rem; margin-top:10px; font-weight:600;">${data.message || 'Error generating invite'}</div>`;
-        }
-      } catch (err) {
-        $('inviteResult').innerHTML = '<div style="color:var(--danger); font-size:0.85rem; margin-top:10px;">Network connection error.</div>';
-      } finally {
-        $('btnGenInvite').disabled = false;
-        $('btnGenInvite').innerHTML = `<svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Generate Magic Link`;
-      }
-    });
-
-    async function loadInvites() {
-      try {
-        const res = await fetch('/admin/api/magic-invites/active', { headers: headers() });
-        if (!res.ok) {
-          $('invitesListContainer').innerHTML = '<p style="color:var(--muted);font-size:0.85rem;">No active invite links.</p>';
-          return;
-        }
-        const data = await res.json();
-        const invites = data.invites || [];
-        if (invites.length === 0) {
-          $('invitesListContainer').innerHTML = '<p style="color:var(--muted);font-size:0.85rem;">No active invite links.</p>';
-          return;
-        }
-        $('invitesListContainer').innerHTML = invites.map((inv) => {
-          const invUrl = location.origin + '/portal/setup?token=' + inv.token;
-          return `
-            <div style="background:#F8FAFC; border:1px solid var(--border); padding:14px; border-radius:12px; margin-bottom:10px;">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <b>Plan: ${inv.term} &bull; ${inv.device_limit} PCs</b>
-                <span class="badge badge-ACTIVE">Valid</span>
-              </div>
-              <div style="font-size:0.8rem; color:var(--muted); margin:6px 0;">Key: <code>${inv.license_key || 'Pending'}</code></div>
-              <button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText('${invUrl}'); alert('Copied!')">Copy Link</button>
-            </div>
-          `;
-        }).join('');
-      } catch (e) {
-        console.warn('loadInvites error:', e);
-      }
-    }
-
-    async function loadBugs() {
-      const res = await fetch('/admin/api/bugs', { headers: headers() });
-      if (!res.ok) return;
-      const { bugs } = await res.json();
-      $('bugsTableBody').innerHTML = bugs.map((b) => `
-        <tr>
-          <td>${new Date(b.created_at).toLocaleString()}</td>
-          <td><span class="code-key">${b.license_key || 'unknown'}</span></td>
-          <td><b>${b.title}</b></td>
-          <td style="font-size:0.85rem;max-width:320px;">${b.description}</td>
-          <td><span class="badge badge-${b.status === 'RESOLVED' ? 'ACTIVE' : 'UNCLAIMED'}">${b.status}</span></td>
-          <td>
-            <button class="btn btn-sm btn-outline" onclick="toggleBugStatus('${b.id}', '${b.status === 'OPEN' ? 'RESOLVED' : 'OPEN'}')">
-              ${b.status === 'OPEN' ? 'Mark Resolved' : 'Reopen'}
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    window.toggleBugStatus = async (id, status) => {
-      await fetch(`/admin/api/bugs/${id}/status`, {
-        method: 'POST',
-        headers: headers(),
-        body: JSON.stringify({ status }),
-      });
-      loadBugs();
-      loadStats();
-    };
-
-    async function loadLogs() {
-      const res = await fetch('/admin/api/audit-logs', { headers: headers() });
-      if (!res.ok) return;
-      const { logs } = await res.json();
-      $('logsTableBody').innerHTML = logs.map((l) => `
-        <tr>
-          <td>${new Date(l.created_at).toLocaleString()}</td>
-          <td><b>${l.event}</b></td>
-          <td><code>${l.ip}</code></td>
-          <td><span class="code-key">${l.license_key || '-'}</span></td>
-          <td style="font-size:0.8rem; color:var(--muted);">${l.details || ''}</td>
-        </tr>
-      `).join('');
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
 
     function loadDashboard() {

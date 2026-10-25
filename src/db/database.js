@@ -156,14 +156,37 @@ function createSchema() {
       created_at INTEGER NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS support_messages (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      license_key TEXT,
+      sender TEXT NOT NULL,
+      message TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      read INTEGER NOT NULL DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS system_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_licenses_key ON licenses(license_key);
     CREATE INDEX IF NOT EXISTS idx_licenses_user ON licenses(user_id);
     CREATE INDEX IF NOT EXISTS idx_devices_license ON devices(license_id);
     CREATE INDEX IF NOT EXISTS idx_devices_devid ON devices(device_id);
     CREATE INDEX IF NOT EXISTS idx_magic_token ON magic_links(token);
     CREATE INDEX IF NOT EXISTS idx_audit_time ON audit_logs(created_at);
+    CREATE INDEX IF NOT EXISTS idx_support_user ON support_messages(user_id);
+    CREATE INDEX IF NOT EXISTS idx_support_time ON support_messages(created_at);
   `;
 
   db.exec(schema);
+
+  // Safe table migrations
+  try {
+    db.exec('ALTER TABLE licenses ADD COLUMN last_regenerated_at INTEGER DEFAULT 0;');
+  } catch (_) {}
+
   console.log('[Database] Schema verified & tables ready.');
 }

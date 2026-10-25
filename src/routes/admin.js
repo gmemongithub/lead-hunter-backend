@@ -1,6 +1,8 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import fs from 'fs';
+import path from 'path';
 import { getDb } from '../db/database.js';
 import { CONFIG } from '../config.js';
 import { requireAdminAuth } from '../middleware/auth.js';
@@ -342,6 +344,175 @@ router.get('/audit-logs', requireAdminAuth, (req, res) => {
   const db = getDb();
   const logs = db.prepare('SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 150').all();
   return res.json({ logs });
+});
+
+/**
+ * Delete Single License
+ * DELETE /admin/api/licenses/:id
+ */
+router.delete('/licenses/:id', requireAdminAuth, (req, res) => {
+  const { id } = req.params;
+  const db = getDb();
+  const lic = db.prepare('SELECT * FROM licenses WHERE id = ?').get(id);
+  if (!lic) return res.status(404).json({ error: 'NOT_FOUND', message: 'License not found.' });
+
+  db.prepare('DELETE FROM devices WHERE license_id = ?').run(id);
+  db.prepare('DELETE FROM magic_links WHERE license_id = ?').run(id);
+  db.prepare('DELETE FROM licenses WHERE id = ?').run(id);
+  return res.json({ ok: true, message: 'License deleted successfully.' });
+});
+
+/**
+ * Bulk Delete Licenses
+ * POST /admin/api/licenses/bulk-delete
+ */
+router.post('/licenses/bulk-delete', requireAdminAuth, (req, res) => {
+  const { ids = [] } = req.body || {};
+  if (!Array.isArray(ids) || !ids.length) {
+    return res.status(400).json({ error: 'BAD_REQUEST', message: 'No license IDs provided.' });
+  }
+  const db = getDb();
+  const placeholders = ids.map(() => '?').join(',');
+  db.prepare(`DELETE FROM devices WHERE license_id IN (${placeholders})`).run(...ids);
+  db.prepare(`DELETE FROM magic_links WHERE license_id IN (${placeholders})`).run(...ids);
+  db.prepare(`DELETE FROM licenses WHERE id IN (${placeholders})`).run(...ids);
+  return res.json({ ok: true, count: ids.length });
+});
+
+/**
+ * Bulk Revoke Licenses
+ * POST /admin/api/licenses/bulk-revoke
+ */
+router.post('/licenses/bulk-revoke', requireAdminAuth, (req, res) => {
+  const { ids = [] } = req.body || {};
+  if (!Array.isArray(ids) || !ids.length) {
+    return res.status(400).json({ error: 'BAD_REQUEST', message: 'No license IDs provided.' });
+  }
+  const db = getDb();
+  const placeholders = ids.map(() => '?').join(',');
+  db.prepare(`UPDATE licenses SET status = 'REVOKED', updated_at = ? WHERE id IN (${placeholders})`).run(Date.now(), ...ids);
+  db.prepare(`DELETE FROM devices WHERE license_id IN (${placeholders})`).run(...ids);
+  return res.json({ ok: true, count: ids.length });
+});
+
+/**
+ * Get License Inspection Details (devices + activity logs)
+ * GET /admin/api/licenses/:id/details
+ */
+router.get('/licenses/:id/details', requireAdminAuth, (req, res) => {
+  const { id } = req.params;
+  const db = getDb();
+  const license = db.prepare(`
+    SELECT l.*, u.email as user_email, u.name as user_account_name
+    FROM licenses l LEFT JOIN users u ON l.user_id = u.id
+    WHERE l.id = ?
+  `).get(id);
+  if (!license) return res.status(404).json({ error: 'NOT_FOUND', message: 'License not found.' });
+
+  const devices = db.prepare('SELECT * FROM devices WHERE license_id = ? ORDER BY last_seen_at DESC').all(id);
+  const logs = db.prepare('SELECT * FROM audit_logs WHERE license_key = ? ORDER BY created_at DESC LIMIT 50').all(license.license_key);
+  return res.json({ ok: true, license, devices, logs });
+});
+
+/**
+ * Support Messages (Admin View)
+ */
+router.get('/support/threads', requireAdminAuth, (req, res) => {
+  const db = getDb();
+  const threads = db.prepare(`
+    SELECT sm.user_id, sm.license_key, u.email, u.name,
+           MAX(sm.created_at) as last_message_at,
+           SUM(CASE WHEN sm.sender = 'user' AND sm.read = 0 THEN 1 ELSE 0 END) as unread_count
+    FROM support_messages sm
+    LEFT JOIN users u ON sm.user_id = u.id
+    GROUP BY sm.user_id, sm.license_key
+    ORDER BY last_message_at DESC
+  `).all();
+  return res.json({ ok: true, threads });
+});
+
+router.get('/support/messages', requireAdminAuth, (req, res) => {
+  const { userId, licenseKey } = req.query || {};
+  const db = getDb();
+  let messages = [];
+  if (userId) {
+    messages = db.prepare('SELECT * FROM support_messages WHERE user_id = ? ORDER BY created_at ASC LIMIT 200').all(userId);
+    db.prepare("UPDATE support_messages SET read = 1 WHERE user_id = ? AND sender = 'user'").run(userId);
+  } else if (licenseKey) {
+    messages = db.prepare('SELECT * FROM support_messages WHERE license_key = ? ORDER BY created_at ASC LIMIT 200').all(licenseKey);
+    db.prepare("UPDATE support_messages SET read = 1 WHERE license_key = ? AND sender = 'user'").run(licenseKey);
+  }
+  return res.json({ ok: true, messages });
+});
+
+router.post('/support/reply', requireAdminAuth, (req, res) => {
+  const { userId, licenseKey, message } = req.body || {};
+  if (!message || (!userId && !licenseKey)) {
+    return res.status(400).json({ error: 'BAD_REQUEST', message: 'Message and target recipient required.' });
+  }
+  const db = getDb();
+  const msgId = generateId('msg');
+  const now = Date.now();
+  db.prepare(`
+    INSERT INTO support_messages (id, user_id, license_key, sender, message, created_at, read)
+    VALUES (?, ?, ?, 'admin', ?, ?, 0)
+  `).run(msgId, userId || null, licenseKey || null, message.trim(), now);
+  return res.json({ ok: true, id: msgId, created_at: now });
+});
+
+/**
+ * Extension Release Manager
+ */
+const releasesDir = path.join(process.cwd(), 'backend/data/releases');
+if (!fs.existsSync(releasesDir)) fs.mkdirSync(releasesDir, { recursive: true });
+
+router.post('/extension/upload', requireAdminAuth, (req, res) => {
+  if (!req.body || !req.body.length) {
+    return res.status(400).json({ error: 'BAD_REQUEST', message: 'No file received.' });
+  }
+  const filename = req.headers['x-filename'] || 'Lead-Hunter-Latest.zip';
+  const version = req.headers['x-version'] || '2.0.0';
+  const filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
+  fs.writeFileSync(filePath, req.body);
+
+  const db = getDb();
+  const now = Date.now();
+  const meta = JSON.stringify({ filename, version, uploaded_at: now, size: req.body.length });
+  db.prepare("INSERT OR REPLACE INTO system_settings (key, value) VALUES ('extension_release', ?)").run(meta);
+  return res.json({ ok: true, filename, version, size: req.body.length });
+});
+
+router.get('/extension/info', requireAdminAuth, (req, res) => {
+  const db = getDb();
+  const row = db.prepare("SELECT value FROM system_settings WHERE key = 'extension_release'").get();
+  const filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
+  const exists = fs.existsSync(filePath);
+  const release = row ? JSON.parse(row.value) : null;
+  return res.json({ ok: true, exists, release });
+});
+
+router.delete('/extension', requireAdminAuth, (req, res) => {
+  const filePath = path.join(releasesDir, 'lead-hunter-latest.zip');
+  if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  const db = getDb();
+  db.prepare("DELETE FROM system_settings WHERE key = 'extension_release'").run();
+  return res.json({ ok: true, message: 'Extension release deleted.' });
+});
+
+/**
+ * WhatsApp Settings
+ */
+router.get('/settings/whatsapp', requireAdminAuth, (req, res) => {
+  const db = getDb();
+  const row = db.prepare("SELECT value FROM system_settings WHERE key = 'whatsapp_number'").get();
+  return res.json({ ok: true, whatsapp: row ? row.value : CONFIG.WHATSAPP_NUMBER });
+});
+
+router.post('/settings/whatsapp', requireAdminAuth, (req, res) => {
+  const { whatsapp } = req.body || {};
+  const db = getDb();
+  db.prepare("INSERT OR REPLACE INTO system_settings (key, value) VALUES ('whatsapp_number', ?)").run((whatsapp || '').trim());
+  return res.json({ ok: true, whatsapp: (whatsapp || '').trim() });
 });
 
 export default router;
